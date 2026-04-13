@@ -1,0 +1,81 @@
+import Image from "next/image";
+import { notFound } from "next/navigation";
+
+import WhatsAppButton from "@/components/WhatsAppButton";
+import { formatPrice, formatWhatsAppPrice } from "@/lib/format";
+import { getProduct } from "@/data/products";
+
+interface ProductDetailPageProps {
+  params: {
+    slug: string;
+  };
+}
+
+const phone = "+5491100000000";
+
+export async function generateMetadata({ params }: ProductDetailPageProps) {
+  const product = await getProduct(params.slug);
+
+  if (!product) {
+    return {
+      title: "Producto no encontrado | Herrería Estudio",
+    };
+  }
+
+  return {
+    title: `${product.name} | Herrería Estudio`,
+    description: product.description,
+  };
+}
+
+export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
+  const product = await getProduct(params.slug);
+
+  if (!product) {
+    notFound();
+  }
+
+  const message = `Hola! Me interesa: ${product.name} - Precio: $${formatWhatsAppPrice(product.price)}. ¿Me podés dar más info?`;
+
+  return (
+    <div className="mx-auto max-w-7xl px-6 pb-20 pt-32 sm:px-8 sm:pb-24 lg:px-12">
+      <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+        <div className="relative aspect-square border border-border bg-slate-100">
+          <Image
+            alt={product.name}
+            className="object-cover"
+            fill
+            priority
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            src={product.image}
+          />
+        </div>
+
+        <div className="flex flex-col justify-center gap-8">
+          <div className="space-y-4 border-b border-border pb-8">
+            <p className="text-xs font-light uppercase tracking-[0.28em] text-accent">
+              {product.category}
+            </p>
+            <h1 className="text-4xl font-semibold uppercase tracking-tight sm:text-5xl">
+              {product.name}
+            </h1>
+            <p className="text-2xl font-semibold text-foreground">{formatPrice(product.price)}</p>
+          </div>
+
+          <div className="space-y-5">
+            <p className="text-base font-light leading-8 text-slate-600">{product.description}</p>
+            <p className="text-sm font-light uppercase tracking-[0.18em] text-slate-500">
+              {product.inStock ? "Disponible para consulta" : "Consultar disponibilidad"}
+            </p>
+          </div>
+
+          <div>
+            <WhatsAppButton className="px-6 py-4" message={message} phone={phone}>
+              Consultar por WhatsApp
+            </WhatsAppButton>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

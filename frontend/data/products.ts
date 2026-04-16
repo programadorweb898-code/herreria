@@ -12,6 +12,7 @@ const products: Product[] = [
     category: "Accesorios",
     inStock: true,
     image: getProductImage("perchero"),
+    additionalImages: ["/download (4).jpg", "/download (5).jpg"],
   },
   {
     _id: "2",
@@ -23,6 +24,7 @@ const products: Product[] = [
     category: "Guardado",
     inStock: true,
     image: getProductImage("estanteria-modular"),
+    additionalImages: ["/download (1).jpg", "/download.jpg"],
   },
   {
     _id: "3",
@@ -34,6 +36,7 @@ const products: Product[] = [
     category: "Mesas",
     inStock: true,
     image: getProductImage("mesa-auxiliar-cubica"),
+    additionalImages: ["/download (6).jpg", "/download (7).jpg"],
   },
   {
     _id: "4",
@@ -45,6 +48,7 @@ const products: Product[] = [
     category: "Guardado",
     inStock: true,
     image: getProductImage("estanteria-pared-lineal"),
+    additionalImages: ["/download (8).jpg", "/download (9).jpg"],
   },
   {
     _id: "5",
@@ -56,6 +60,7 @@ const products: Product[] = [
     category: "Guardado",
     inStock: true,
     image: getProductImage("estanteria-acero-geometrico"),
+    additionalImages: ["/download (2).jpg", "/download (3).jpg"],
   },
   {
     _id: "6",
@@ -67,6 +72,7 @@ const products: Product[] = [
     category: "Asientos",
     inStock: true,
     image: getProductImage("banco-industrial"),
+    additionalImages: ["/download (10).jpg", "/download (11).jpg"],
   },
 ];
 

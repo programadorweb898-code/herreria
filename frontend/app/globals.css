@@ -8,6 +8,13 @@
 
 html {
   scroll-behavior: smooth;
+  font-size: 15px; /* Reducimos el base de 16px a 15px para que todo lo que use 'rem' sea un poco más chico */
+}
+
+@media (max-width: 640px) {
+  html {
+    font-size: 14px; /* Un toque más chico aún en móviles para ganar espacio */
+  }
 }
 
 body {

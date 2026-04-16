@@ -7,4 +7,5 @@ export interface Product {
   category: string;
   inStock: boolean;
   image: string;
+  additionalImages?: string[];
 }

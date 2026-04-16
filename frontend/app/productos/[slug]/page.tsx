@@ -2,6 +2,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 
 import WhatsAppButton from "@/components/WhatsAppButton";
+import ProductImageCarousel from "@/components/ProductImageCarousel";
 import { formatPrice, formatWhatsAppPrice } from "@/lib/format";
 import { getProduct } from "@/data/products";
 
@@ -40,16 +41,11 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   return (
     <div className="mx-auto max-w-7xl px-6 pb-20 pt-32 sm:px-8 sm:pb-24 lg:px-12">
       <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
-        <div className="relative aspect-square border border-border bg-slate-100">
-          <Image
-            alt={product.name}
-            className="object-cover"
-            fill
-            priority
-            sizes="(max-width: 1024px) 100vw, 50vw"
-            src={product.image}
-          />
-        </div>
+        <ProductImageCarousel 
+          image={product.image} 
+          name={product.name} 
+          additionalImages={product.additionalImages} 
+        />
 
         <div className="flex flex-col justify-center gap-8">
           <div className="space-y-4 border-b border-border pb-8">

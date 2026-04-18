@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { notFound } from "next/navigation";
 
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -20,12 +19,12 @@ export async function generateMetadata({ params }: ProductDetailPageProps) {
 
   if (!product) {
     return {
-      title: "Producto no encontrado | Herrería Estudio",
+      title: "Producto no encontrado | HerrerÃ­a Estudio",
     };
   }
 
   return {
-    title: `${product.name} | Herrería Estudio`,
+    title: `${product.name} | HerrerÃ­a Estudio`,
     description: product.description,
   };
 }
@@ -38,15 +37,15 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     notFound();
   }
 
-  const message = `Hola! Me interesa: ${product.name} - Precio: $${formatWhatsAppPrice(product.price)}. ¿Me podés dar más info?`;
+  const message = `Hola! Me interesa: ${product.name} - Precio: $${formatWhatsAppPrice(product.price)}. Â¿Me podÃ©s dar mÃ¡s info?`;
 
   return (
     <div className="mx-auto max-w-7xl px-6 pb-20 pt-32 sm:px-8 sm:pb-24 lg:px-12">
       <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
-        <ProductImageCarousel 
-          image={product.image} 
-          name={product.name} 
-          additionalImages={product.additionalImages} 
+        <ProductImageCarousel
+          image={product.image}
+          name={product.name}
+          additionalImages={product.additionalImages}
         />
 
         <div className="flex flex-col justify-center gap-8">

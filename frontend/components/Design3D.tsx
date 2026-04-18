@@ -1,6 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import type {
+  Mesh,
+  PerspectiveCamera,
+  Scene,
+  WebGLRenderer,
+} from "three";
 
 interface Design3DProps {
   design: {
@@ -14,147 +20,180 @@ interface Design3DProps {
   };
 }
 
+interface SceneState {
+  mesh: Mesh;
+  renderer: WebGLRenderer;
+  scene: Scene;
+  camera: PerspectiveCamera;
+  animationId: number;
+}
+
 export default function Design3D({ design }: Design3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const sceneRef = useRef<any>(null);
+  const sceneRef = useRef<SceneState | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    Promise.resolve().then(() => {
-      import("three").then(
-        ({ Scene, PerspectiveCamera, WebGLRenderer, BoxGeometry, MeshPhongMaterial, Mesh, DirectionalLight, AmbientLight, LineSegments, LineBasicMaterial, EdgesGeometry }) => {
-          const container = containerRef.current;
-          if (!container) return;
+    let animationId = 0;
+    let handleResize: (() => void) | null = null;
+    let disposed = false;
 
-          while (container.firstChild) {
-            container.removeChild(container.firstChild);
-          }
+    void import("three").then(
+      ({
+        AmbientLight,
+        BoxGeometry,
+        Color,
+        DirectionalLight,
+        EdgesGeometry,
+        LineBasicMaterial,
+        LineSegments,
+        Mesh,
+        MeshPhongMaterial,
+        PerspectiveCamera,
+        Scene,
+        WebGLRenderer,
+      }) => {
+        const container = containerRef.current;
+        if (!container || disposed) return;
 
-          try {
-            const scene = new Scene();
-            (scene.background as any) = { r: 0.98, g: 0.98, b: 0.98 };
-
-            const width = container.clientWidth || 600;
-            const height = container.clientHeight || 400;
-
-            const camera = new PerspectiveCamera(50, width / height, 0.1, 1000);
-            camera.position.set(250, 200, 300);
-            camera.lookAt(0, 0, 0);
-
-            const renderer = new WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(width, height);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.shadowMap.enabled = true;
-            container.appendChild(renderer.domElement);
-
-            // Escalar dimensiones
-            const scale = 0.8;
-            const w = design.width * scale;
-            const h = design.height * scale;
-            const d = design.depth * scale;
-
-            // Crear geometría
-            const geometry = new BoxGeometry(w, h, d);
-
-            // Material: Gris claro minimalista
-            const materialColor = 0xd0d0d0;
-            const material = new MeshPhongMaterial({
-              color: materialColor,
-              shininess: 20,
-              wireframe: false,
-            });
-
-            const mesh = new Mesh(geometry, material);
-            (mesh as any).castShadow = true;
-            (mesh as any).receiveShadow = true;
-            scene.add(mesh);
-
-            // BORDES/ARISTAS - Estilo técnico minimalista
-            const edges = new EdgesGeometry(geometry);
-            const linesMaterial = new LineBasicMaterial({
-              color: 0x333333,
-              linewidth: 2,
-              transparent: true,
-              opacity: 0.7,
-            });
-            const wireframe = new LineSegments(edges, linesMaterial);
-            mesh.add(wireframe);
-
-            // Iluminación suave + técnica
-            const ambientLight = new AmbientLight(0xffffff, 0.7);
-            scene.add(ambientLight);
-
-            const directionalLight = new DirectionalLight(0xffffff, 0.6);
-            directionalLight.position.set(200, 200, 200);
-            directionalLight.castShadow = true;
-            (directionalLight as any).shadow.mapSize.width = 2048;
-            (directionalLight as any).shadow.mapSize.height = 2048;
-            (directionalLight as any).shadow.camera.far = 1000;
-            (directionalLight as any).shadow.camera.left = -500;
-            (directionalLight as any).shadow.camera.right = 500;
-            (directionalLight as any).shadow.camera.top = 500;
-            (directionalLight as any).shadow.camera.bottom = -500;
-            scene.add(directionalLight);
-
-            // Luz de relleno suave
-            const fillLight = new DirectionalLight(0xffffff, 0.2);
-            fillLight.position.set(-200, 100, -200);
-            scene.add(fillLight);
-
-            // Rotación automática controlada
-            let animationId: number;
-            let rotationX = 0.3;
-            let rotationY = 0.5;
-
-            const animate = () => {
-              animationId = requestAnimationFrame(animate);
-              
-              // Rotación suave
-              mesh.rotation.x += 0.0015;
-              mesh.rotation.y += 0.002;
-              
-              renderer.render(scene, camera);
-            };
-            animate();
-
-            // Manejo de resize
-            const handleResize = () => {
-              if (!containerRef.current) return;
-              const w = containerRef.current.clientWidth;
-              const h = containerRef.current.clientHeight;
-              camera.aspect = w / h;
-              camera.updateProjectionMatrix();
-              renderer.setSize(w, h);
-            };
-
-            window.addEventListener("resize", handleResize);
-            sceneRef.current = { mesh, renderer, scene, camera, animationId };
-            setIsLoaded(true);
-
-            return () => {
-              window.removeEventListener("resize", handleResize);
-              cancelAnimationFrame(animationId);
-              renderer.dispose();
-              (geometry as any).dispose();
-              material.dispose();
-              linesMaterial.dispose();
-            };
-          } catch (error) {
-            console.error("Error al crear visualización 3D:", error);
-            setIsLoaded(false);
-          }
+        while (container.firstChild) {
+          container.removeChild(container.firstChild);
         }
-      );
-    });
+
+        try {
+          const scene = new Scene();
+          scene.background = new Color(0xfafafa);
+
+          const width = container.clientWidth || 600;
+          const height = container.clientHeight || 400;
+
+          const camera = new PerspectiveCamera(50, width / height, 0.1, 1000);
+          camera.position.set(250, 200, 300);
+          camera.lookAt(0, 0, 0);
+
+          const renderer = new WebGLRenderer({ antialias: true, alpha: true });
+          renderer.setSize(width, height);
+          renderer.setPixelRatio(window.devicePixelRatio);
+          renderer.shadowMap.enabled = true;
+          container.appendChild(renderer.domElement);
+
+          const scale = 0.8;
+          const scaledWidth = design.width * scale;
+          const scaledHeight = design.height * scale;
+          const scaledDepth = design.depth * scale;
+
+          const geometry = new BoxGeometry(scaledWidth, scaledHeight, scaledDepth);
+          const material = new MeshPhongMaterial({
+            color: 0xd0d0d0,
+            shininess: 20,
+            wireframe: false,
+          });
+
+          const mesh = new Mesh(geometry, material);
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+          scene.add(mesh);
+
+          const edges = new EdgesGeometry(geometry);
+          const linesMaterial = new LineBasicMaterial({
+            color: 0x333333,
+            linewidth: 2,
+            transparent: true,
+            opacity: 0.7,
+          });
+          const wireframe = new LineSegments(edges, linesMaterial);
+          mesh.add(wireframe);
+
+          const ambientLight = new AmbientLight(0xffffff, 0.7);
+          scene.add(ambientLight);
+
+          const directionalLight = new DirectionalLight(0xffffff, 0.6);
+          directionalLight.position.set(200, 200, 200);
+          directionalLight.castShadow = true;
+          directionalLight.shadow.mapSize.width = 2048;
+          directionalLight.shadow.mapSize.height = 2048;
+          directionalLight.shadow.camera.far = 1000;
+          directionalLight.shadow.camera.left = -500;
+          directionalLight.shadow.camera.right = 500;
+          directionalLight.shadow.camera.top = 500;
+          directionalLight.shadow.camera.bottom = -500;
+          scene.add(directionalLight);
+
+          const fillLight = new DirectionalLight(0xffffff, 0.2);
+          fillLight.position.set(-200, 100, -200);
+          scene.add(fillLight);
+
+          const animate = () => {
+            animationId = requestAnimationFrame(animate);
+            mesh.rotation.x += 0.0015;
+            mesh.rotation.y += 0.002;
+            renderer.render(scene, camera);
+          };
+          animate();
+
+          handleResize = () => {
+            if (!containerRef.current) return;
+            const nextWidth = containerRef.current.clientWidth;
+            const nextHeight = containerRef.current.clientHeight;
+            camera.aspect = nextWidth / nextHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(nextWidth, nextHeight);
+          };
+
+          window.addEventListener("resize", handleResize);
+          sceneRef.current = { mesh, renderer, scene, camera, animationId };
+          setIsLoaded(true);
+
+          if (disposed) {
+            window.removeEventListener("resize", handleResize);
+            cancelAnimationFrame(animationId);
+            renderer.dispose();
+            geometry.dispose();
+            edges.dispose();
+            material.dispose();
+            linesMaterial.dispose();
+          }
+        } catch (error) {
+          console.error("Error al crear visualizaciÃ³n 3D:", error);
+          setIsLoaded(false);
+        }
+      }
+    );
+
+    return () => {
+      disposed = true;
+      setIsLoaded(false);
+
+      if (handleResize) {
+        window.removeEventListener("resize", handleResize);
+      }
+
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+
+      if (sceneRef.current) {
+        sceneRef.current.renderer.dispose();
+        sceneRef.current.mesh.geometry.dispose();
+        if (Array.isArray(sceneRef.current.mesh.material)) {
+          for (const material of sceneRef.current.mesh.material) {
+            material.dispose();
+          }
+        } else {
+          sceneRef.current.mesh.material.dispose();
+        }
+        sceneRef.current = null;
+      }
+    };
   }, [design]);
 
   return (
     <div className="w-full space-y-4">
       {!isLoaded && (
         <div className="w-full h-96 rounded border border-border bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center text-sm text-slate-500">
-          Cargando visualización 3D...
+          Cargando visualizaciÃ³n 3D...
         </div>
       )}
       <div

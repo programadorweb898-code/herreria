@@ -19,13 +19,18 @@ interface Message {
   };
 }
 
+interface ChatApiResponse {
+  response?: string;
+  design?: Message["design"];
+}
+
 export default function DesignGeneratorForm() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
       role: "assistant",
       content:
-        "¡Hola! Soy tu asistente de diseño de Herrería Estudio. Cuéntame sobre la pieza que deseas diseñar: dimensiones aproximadas, material, estilo, función... Y juntos crearemos el diseño perfecto para tu espacio.",
+        "Â¡Hola! Soy tu asistente de diseÃ±o de HerrerÃ­a Estudio. CuÃ©ntame sobre la pieza que deseas diseÃ±ar: dimensiones aproximadas, material, estilo, funciÃ³n... Y juntos crearemos el diseÃ±o perfecto para tu espacio.",
       timestamp: new Date(),
     },
   ]);
@@ -41,19 +46,11 @@ export default function DesignGeneratorForm() {
     scrollToBottom();
   }, [messages]);
 
-  const calculatePrice = (width: number, height: number, depth: number, complexity: number): number => {
-    const basePrice = 50000;
-    const area = (width * height + height * depth + width * depth) / 1000;
-    const complexityMultiplier = 1 + (complexity * 0.3);
-    return Math.round(basePrice + area * 10000 * complexityMultiplier);
-  };
-
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     const messageText = input.trim();
     if (!messageText || loading) return;
 
-    // Agregar mensaje del usuario
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
@@ -67,7 +64,6 @@ export default function DesignGeneratorForm() {
     setLoading(true);
 
     try {
-      // Construir historial sin fechas (serializable)
       const conversationHistory = updatedMessages.map((msg) => ({
         role: msg.role,
         content: msg.content,
@@ -83,7 +79,7 @@ export default function DesignGeneratorForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: messageText,
-          conversationHistory: conversationHistory,
+          conversationHistory,
         }),
       });
 
@@ -93,7 +89,7 @@ export default function DesignGeneratorForm() {
         throw new Error(`Error ${response.status}: ${errorText}`);
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as ChatApiResponse;
       console.log("API response:", data);
 
       if (!data.response) {
@@ -127,14 +123,13 @@ export default function DesignGeneratorForm() {
     <div className="w-full space-y-6 max-w-2xl mx-auto">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-light tracking-tighter text-foreground mb-2">
-          Asistente de Diseño Personalizado
+          Asistente de DiseÃ±o Personalizado
         </h2>
         <p className="text-sm font-light text-slate-600">
-          Chatea con Gemini para diseñar tu pieza personalizada
+          Chatea con Gemini para diseÃ±ar tu pieza personalizada
         </p>
       </div>
 
-      {/* Chat Container */}
       <div className="border border-border bg-white rounded h-96 overflow-y-auto p-6 space-y-4">
         {messages.map((message) => (
           <div
@@ -153,15 +148,14 @@ export default function DesignGeneratorForm() {
           </div>
         ))}
 
-        {/* Design Display */}
         {messages
-          .filter((m) => m.design)
+          .filter((message) => message.design)
           .map((message) =>
             message.design ? (
               <div key={`design-${message.id}`} className="mt-6 pt-4 border-t border-slate-200">
                 <div className="mb-4">
                   <h3 className="text-sm font-semibold uppercase tracking-[0.1em] text-foreground mb-4">
-                    Diseño 3D - Visualización
+                    DiseÃ±o 3D - VisualizaciÃ³n
                   </h3>
                   <Design3D design={message.design} />
 
@@ -171,10 +165,12 @@ export default function DesignGeneratorForm() {
                         Especificaciones
                       </p>
                       <div className="text-xs font-light space-y-1 text-slate-700">
-                        <p>📏 {message.design.width}×{message.design.height}×{message.design.depth}cm</p>
-                        <p>🔧 {message.design.material}</p>
                         <p>
-                          ⚙️{" "}
+                          ðŸ“ {message.design.width}Ã—{message.design.height}Ã—{message.design.depth}cm
+                        </p>
+                        <p>ðŸ”§ {message.design.material}</p>
+                        <p>
+                          âš™ï¸{" "}
                           {["Baja", "Media", "Alta", "Muy Alta"][message.design.complexity - 1]}
                         </p>
                       </div>
@@ -186,7 +182,7 @@ export default function DesignGeneratorForm() {
                       <p className="text-2xl font-light text-foreground">
                         ${message.design.price.toLocaleString("es-AR")}
                       </p>
-                      <p className="text-xs text-slate-500 mt-1">ARS (sujeto a confirmación)</p>
+                      <p className="text-xs text-slate-500 mt-1">ARS (sujeto a confirmaciÃ³n)</p>
                     </div>
                   </div>
                 </div>
@@ -197,7 +193,7 @@ export default function DesignGeneratorForm() {
         {loading && (
           <div className="flex justify-start">
             <div className="bg-slate-100 px-4 py-3 rounded text-sm text-slate-600">
-              Gemini está pensando...
+              Gemini estÃ¡ pensando...
             </div>
           </div>
         )}
@@ -205,13 +201,12 @@ export default function DesignGeneratorForm() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Form */}
       <form onSubmit={sendMessage} className="flex gap-2">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Describe tu diseño, pregunta sobre materiales, precios..."
+          placeholder="Describe tu diseÃ±o, pregunta sobre materiales, precios..."
           disabled={loading}
           className="flex-1 px-4 py-3 border border-border rounded text-sm font-light focus:outline-none focus:border-foreground disabled:opacity-50"
         />
@@ -225,7 +220,7 @@ export default function DesignGeneratorForm() {
       </form>
 
       <p className="text-xs text-slate-500 text-center">
-        Puedes hacer múltiples preguntas, pedir ajustes, consultar sobre materiales, etc.
+        Puedes hacer mÃºltiples preguntas, pedir ajustes, consultar sobre materiales, etc.
       </p>
     </div>
   );

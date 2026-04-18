@@ -13,23 +13,37 @@ interface DesignResponse {
   material: string;
 }
 
+interface GeminiResponse {
+  candidates?: Array<{
+    content?: {
+      parts?: Array<{
+        text?: string;
+      }>;
+    };
+  }>;
+}
+
+interface RawDesignResponse {
+  description?: unknown;
+  width?: string | number;
+  height?: string | number;
+  depth?: string | number;
+  complexity?: string | number;
+  material?: unknown;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { prompt }: DesignRequest = await request.json();
 
     if (!prompt || typeof prompt !== "string") {
-      return NextResponse.json(
-        { error: "Prompt inválido" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Prompt invÃ¡lido" }, { status: 400 });
     }
 
-    // Integramos con Gemini API
     const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
 
     if (!apiKey) {
       console.error("GOOGLE_GEMINI_API_KEY no configurada");
-      // Respuesta simulada para desarrollo sin API key
       return NextResponse.json(generateMockResponse(prompt));
     }
 
@@ -58,63 +72,64 @@ export async function POST(request: NextRequest) {
       throw new Error("Error en Gemini API");
     }
 
-    const data = await response.json();
-    const content = data.contents?.[0]?.parts?.[0]?.text;
+    const data = (await response.json()) as GeminiResponse;
+    const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!content) {
-      throw new Error("Respuesta vacía de Gemini");
+      throw new Error("Respuesta vacÃ­a de Gemini");
     }
 
-    // Parseamos la respuesta JSON
     const designData = parseDesignResponse(content);
     return NextResponse.json(designData);
   } catch (error) {
     console.error("Error en design-generator API:", error);
     return NextResponse.json(
-      { error: "Error procesando el diseño" },
+      { error: "Error procesando el diseÃ±o" },
       { status: 500 }
     );
   }
 }
 
 function buildPrompt(userPrompt: string): string {
-  return `Eres un experto en diseño de muebles de herrería. Analiza esta descripción de cliente y extrae las dimensiones, material y complejidad.
+  return `Eres un experto en diseÃ±o de muebles de herrerÃ­a. Analiza esta descripciÃ³n de cliente y extrae las dimensiones, material y complejidad.
 
-Descripción del cliente: "${userPrompt}"
+DescripciÃ³n del cliente: "${userPrompt}"
 
-Responde SOLO en formato JSON válido (sin markdown, sin comillas adicionales) con esta estructura exacta:
+Responde SOLO en formato JSON vÃ¡lido (sin markdown, sin comillas adicionales) con esta estructura exacta:
 {
-  "description": "Descripción breve del diseño",
-  "width": número en cm,
-  "height": número en cm,
-  "depth": número en cm,
-  "complexity": número del 1 al 4,
+  "description": "DescripciÃ³n breve del diseÃ±o",
+  "width": nÃºmero en cm,
+  "height": nÃºmero en cm,
+  "depth": nÃºmero en cm,
+  "complexity": nÃºmero del 1 al 4,
   "material": "hierro|acero|acero_inoxidable|madera|combinado"
 }
 
 Notas:
-- Si el cliente no especifica dimensión, usa valores típicos (ej: 150cm ancho, 80cm alto)
-- Complexity: 1=simple/lineal, 2=modular básico, 3=diseño arquitectónico, 4=muy elaborado
+- Si el cliente no especifica dimensiÃ³n, usa valores tÃ­picos (ej: 150cm ancho, 80cm alto)
+- Complexity: 1=simple/lineal, 2=modular bÃ¡sico, 3=diseÃ±o arquitectÃ³nico, 4=muy elaborado
 - Siempre extrae el material mencionado o usa "acero" por defecto`;
 }
 
 function parseDesignResponse(content: string): DesignResponse {
   try {
-    // Limpia markdown si existe
-    let cleanContent = content
+    const cleanContent = content
       .replace(/```json\n?/g, "")
       .replace(/```\n?/g, "")
       .trim();
 
-    const parsed = JSON.parse(cleanContent);
+    const parsed = JSON.parse(cleanContent) as RawDesignResponse;
 
     return {
-      description: parsed.description || "Diseño personalizado",
-      width: Math.max(30, Math.min(300, parseInt(parsed.width) || 150)),
-      height: Math.max(30, Math.min(300, parseInt(parsed.height) || 100)),
-      depth: Math.max(20, Math.min(100, parseInt(parsed.depth) || 30)),
-      complexity: Math.max(1, Math.min(4, parseInt(parsed.complexity) || 2)),
-      material: parsed.material || "acero",
+      description:
+        typeof parsed.description === "string"
+          ? parsed.description
+          : "DiseÃ±o personalizado",
+      width: Math.max(30, Math.min(300, parseInt(String(parsed.width), 10) || 150)),
+      height: Math.max(30, Math.min(300, parseInt(String(parsed.height), 10) || 100)),
+      depth: Math.max(20, Math.min(100, parseInt(String(parsed.depth), 10) || 30)),
+      complexity: Math.max(1, Math.min(4, parseInt(String(parsed.complexity), 10) || 2)),
+      material: typeof parsed.material === "string" ? parsed.material : "acero",
     };
   } catch {
     return generateMockResponse("");
@@ -122,13 +137,12 @@ function parseDesignResponse(content: string): DesignResponse {
 }
 
 function generateMockResponse(prompt: string): DesignResponse {
-  // Valores simulados basados en el prompt
   const hasLarge = /grande|200|alto/i.test(prompt);
-  const hasSimple = /simple|básico|minimal/i.test(prompt);
-  const hasComplex = /complejo|múltiple|elaborado/i.test(prompt);
+  const hasSimple = /simple|bÃ¡sico|minimal/i.test(prompt);
+  const hasComplex = /complejo|mÃºltiple|elaborado/i.test(prompt);
 
   return {
-    description: "Diseño personalizado según especificaciones",
+    description: "DiseÃ±o personalizado segÃºn especificaciones",
     width: hasLarge ? 200 : 150,
     height: hasLarge ? 220 : 100,
     depth: 35,

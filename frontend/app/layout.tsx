@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import ScrollToTop from "@/components/ScrollToTop";
 
 import "./globals.css";
 
@@ -25,6 +26,7 @@ export default function RootLayout({
   return (
     <html className={inter.variable} lang="es">
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
+        <ScrollToTop />
         <Navbar />
         <main>{children}</main>
         <Footer />

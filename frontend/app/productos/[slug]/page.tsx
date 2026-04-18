@@ -7,15 +7,16 @@ import { formatPrice, formatWhatsAppPrice } from "@/lib/format";
 import { getProduct } from "@/data/products";
 
 interface ProductDetailPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 const phone = "+5491100000000";
 
 export async function generateMetadata({ params }: ProductDetailPageProps) {
-  const product = await getProduct(params.slug);
+  const { slug } = await params;
+  const product = await getProduct(slug);
 
   if (!product) {
     return {
@@ -30,7 +31,8 @@ export async function generateMetadata({ params }: ProductDetailPageProps) {
 }
 
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
-  const product = await getProduct(params.slug);
+  const { slug } = await params;
+  const product = await getProduct(slug);
 
   if (!product) {
     notFound();

@@ -1,13 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 :root {
   color-scheme: light;
 }
 
 html {
-  scroll-behavior: smooth;
   font-size: 15px; /* Reducimos el base de 16px a 15px para que todo lo que use 'rem' sea un poco más chico */
 }
 

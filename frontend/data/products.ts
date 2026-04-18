@@ -85,5 +85,7 @@ export async function getFeaturedProducts(): Promise<Product[]> {
 }
 
 export async function getProduct(slug: string): Promise<Product | null> {
-  return products.find((product) => product.slug === slug) ?? null;
+  const decodedSlug = decodeURIComponent(slug);
+  console.log('Buscando producto con slug:', decodedSlug);
+  return products.find((product) => product.slug === decodedSlug) ?? null;
 }

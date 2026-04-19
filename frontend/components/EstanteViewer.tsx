@@ -6,7 +6,7 @@ import { OrbitControls, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import type { GLTF } from "three-stdlib";
 
-const MODEL_PATH = "/models/base.glb";
+const MODEL_PATH = "/models/base_basic_shaded.glb";
 
 interface Props {
   width?: number;

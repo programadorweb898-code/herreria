@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, useGLTF } from "@react-three/drei";
+import { Center, OrbitControls, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import type { GLTF } from "three-stdlib";
 
@@ -12,6 +12,7 @@ interface Props {
   width?: number;
   height?: number;
   depth?: number;
+  scale?: number;
 }
 
 function EstanteModel({
@@ -65,7 +66,9 @@ export default function EstanteViewer({
         <Canvas camera={{ position: [2, 2, 2], fov: 50 }}>
           <ambientLight intensity={1} />
           <directionalLight position={[5, 5, 5]} intensity={1} />
-          <EstanteModel width={width} height={height} depth={depth} />
+          <Center>
+            <EstanteModel width={width} height={height} depth={depth} />
+          </Center>
           <OrbitControls enableDamping />
         </Canvas>
       </Suspense>

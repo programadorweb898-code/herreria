@@ -32,24 +32,23 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="flex flex-1 flex-col gap-5 pt-6">
         <div className="space-y-3">
           <Link href={`/productos/${product.slug}`}>
-            <h3 className="text-sm font-light uppercase tracking-[0.2em] text-foreground transition group-hover:text-accent">
+            <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-foreground transition group-hover:text-accent">
               {product.name}
             </h3>
           </Link>
-          <p className="text-xs font-light leading-6 text-slate-500">{product.description}</p>
         </div>
 
         <div className="mt-auto pt-2 flex flex-col gap-2">
-          <span className="mb-3 block text-lg font-light tracking-[-0.03em] text-foreground">
+          <span className="mb-3 block text-lg font-bold tracking-[-0.03em] text-foreground">
             {formatPrice(product.price)}
           </span>
           <WhatsAppButton className="w-full justify-center px-4 py-3 text-[10px]" message={message} phone={phone}>
             Contactar por WhatsApp
           </WhatsAppButton>
-          <Link 
-            href="/diseno-personalizado"
-            className="inline-flex w-full items-center justify-center bg-black px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-white transition hover:bg-neutral-800"
-          >
+<Link 
+              href={`/diseno-personalizado?width=${product.width || 100}&height=${product.height || 100}&depth=${product.depth || 30}`}
+              className="inline-flex w-full items-center justify-center bg-black px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-white transition hover:bg-neutral-800"
+            >
             Diseño personalizado
           </Link>
         </div>

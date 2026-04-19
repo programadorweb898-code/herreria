@@ -9,4 +9,7 @@ export interface Product {
   image: string;
   additionalImages?: string[];
   detailDescription?: string;
+  width?: number;
+  height?: number;
+  depth?: number;
 }

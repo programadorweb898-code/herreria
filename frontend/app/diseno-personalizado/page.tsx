@@ -1,7 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useState, useMemo } from "react";
 
 import WhatsAppButton from "@/components/WhatsAppButton";
 
@@ -24,6 +25,7 @@ function SliderControl({
   max,
   step,
   onChange,
+  unit = "cm",
 }: {
   label: string;
   value: number;
@@ -31,6 +33,7 @@ function SliderControl({
   max: number;
   step: number;
   onChange: (value: number) => void;
+  unit?: string;
 }) {
   return (
     <label className="space-y-3">
@@ -39,7 +42,7 @@ function SliderControl({
           {label}
         </span>
         <span className="text-sm font-semibold uppercase tracking-[0.16em] text-foreground">
-          {Math.round(value * 100)} cm
+          {Math.round(value)} {unit}
         </span>
       </div>
       <input
@@ -55,16 +58,82 @@ function SliderControl({
   );
 }
 
+function NumberInput({
+  label,
+  value,
+  min,
+  max,
+  step,
+  onChange,
+  unit = "cm",
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  onChange: (value: number) => void;
+  unit?: string;
+}) {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let newValue = Number(e.target.value);
+    if (newValue < min) newValue = min;
+    if (newValue > max) newValue = max;
+    onChange(newValue);
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-xs font-light uppercase tracking-[0.24em] text-accent">
+        {label}
+      </span>
+      <div className="flex items-center gap-2">
+        <input
+          type="number"
+          min={min}
+          max={max}
+          step={step}
+          value={value}
+          onChange={handleChange}
+          className="w-full border border-border bg-white px-3 py-2 text-sm uppercase tracking-[0.16em] text-foreground"
+        />
+        <span className="text-xs font-light uppercase tracking-[0.16em] text-slate-500">
+          {unit}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default function DisenoPersonalizadoPage() {
-  const [width, setWidth] = useState(1);
-  const [height, setHeight] = useState(1);
-  const [depth, setDepth] = useState(1);
+  const searchParams = useSearchParams();
+
+  const initialWidth = useMemo(
+    () => Number(searchParams.get("width")) || 100,
+    [searchParams]
+  );
+  const initialHeight = useMemo(
+    () => Number(searchParams.get("height")) || 100,
+    [searchParams]
+  );
+  const initialDepth = useMemo(
+    () => Number(searchParams.get("depth")) || 30,
+    [searchParams]
+  );
+
+  const [width, setWidth] = useState(initialWidth);
+  const [height, setHeight] = useState(initialHeight);
+  const [depth, setDepth] = useState(initialDepth);
 
   return (
     <div className="mx-auto max-w-5xl px-6 pb-20 pt-32 sm:px-8 sm:pb-24 lg:px-12">
       <section className="mb-10 grid gap-px border border-border bg-border lg:grid-cols-[1.6fr_1fr]">
         <div className="bg-white p-4 sm:p-6">
-          <EstanteViewer width={width} height={height} depth={depth} />
+          <EstanteViewer 
+            width={width / 100} 
+            height={height / 100} 
+            depth={depth / 100} 
+          />
         </div>
 
         <div className="flex flex-col justify-center gap-8 bg-white px-6 py-8 sm:px-8 sm:py-10">
@@ -82,30 +151,60 @@ export default function DisenoPersonalizadoPage() {
           </div>
 
           <div className="space-y-6">
-            <SliderControl
-              label="Ancho"
-              value={width}
-              min={0.5}
-              max={2}
-              step={0.1}
-              onChange={setWidth}
-            />
-            <SliderControl
-              label="Alto"
-              value={height}
-              min={0.5}
-              max={2}
-              step={0.1}
-              onChange={setHeight}
-            />
-            <SliderControl
-              label="Profundidad"
-              value={depth}
-              min={0.5}
-              max={2}
-              step={0.1}
-              onChange={setDepth}
-            />
+            <div className="grid grid-cols-[1fr_100px] gap-4">
+              <SliderControl
+                label="Ancho"
+                value={width}
+                min={10}
+                max={250}
+                step={1}
+                onChange={setWidth}
+              />
+              <NumberInput
+                label=""
+                value={width}
+                min={10}
+                max={250}
+                step={1}
+                onChange={setWidth}
+              />
+            </div>
+            <div className="grid grid-cols-[1fr_100px] gap-4">
+              <SliderControl
+                label="Alto"
+                value={height}
+                min={10}
+                max={250}
+                step={1}
+                onChange={setHeight}
+              />
+              <NumberInput
+                label=""
+                value={height}
+                min={10}
+                max={250}
+                step={1}
+                onChange={setHeight}
+              />
+            </div>
+            <div className="grid grid-cols-[1fr_100px] gap-4">
+              <SliderControl
+                label="Profundidad"
+                value={depth}
+                min={10}
+                max={100}
+                step={1}
+                onChange={setDepth}
+              />
+              <NumberInput
+                label=""
+                value={depth}
+                min={10}
+                max={100}
+                step={1}
+                onChange={setDepth}
+              />
+            </div>
           </div>
         </div>
       </section>

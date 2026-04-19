@@ -12,14 +12,13 @@ interface Props {
   width?: number;
   height?: number;
   depth?: number;
-  scale?: number;
 }
 
 function EstanteModel({
   width = 1,
   height = 1,
   depth = 1,
-}: Required<Props>) {
+}: Props) {
   const gltf = useGLTF(MODEL_PATH) as GLTF;
   const sourceScene: THREE.Group | null = gltf?.scene ?? null;
 

@@ -60,7 +60,9 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
           </div>
 
           <div className="space-y-5">
-            <p className="text-base font-light leading-8 text-slate-600">{product.description}</p>
+            <p className="whitespace-pre-line text-base font-light leading-8 text-slate-600">
+              {product.detailDescription || product.description}
+            </p>
             <p className="text-sm font-light uppercase tracking-[0.18em] text-slate-500">
               {product.inStock ? "Disponible para consulta" : "Consultar disponibilidad"}
             </p>

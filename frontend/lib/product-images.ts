@@ -1,10 +1,10 @@
 const productImages: Record<string, string> = {
-  "perchero": "/Gemini_Generated_Image_3geyj93geyj93gey.png",
-  "estanteria-modular": "/Gemini_Generated_Image_9mrj8j9mrj8j9mrj.png",
-  "mesa-auxiliar-cubica": "/Gemini_Generated_Image_iw9ykaiw9ykaiw9y.png",
-  "estanteria-pared-lineal": "/Gemini_Generated_Image_mqrphdmqrphdmqrp.png",
-  "estanteria-acero-geometrico": "/Gemini_Generated_Image_sxl7dqsxl7dqsxl7.png",
-  "banco-industrial": "/Gemini_Generated_Image_wu8j42wu8j42wu8j.png",
+  "perchero": "/Estanteria-Tupungato-300x300.webp",
+  "estanteria-modular": "/estanteria=montecarlo.webp",
+  "mesa-auxiliar-cubica": "/dresuar-filadelfia.webp",
+  "estanteria-pared-lineal": "/bodega-milan.webp",
+  "estanteria-acero-geometrico": "/models/banqueta.webp",
+  "banco-industrial": "/mesa-ratona.webp",
 };
 
 const slugByName: Record<string, string> = {
@@ -29,5 +29,5 @@ export function getProductImage(slug?: string, name?: string, image?: string) {
     return image;
   }
 
-  return "/Gemini_Generated_Image_wu8j42wu8j42wu8j.png";
+  return "/mesa-ratona.webp";
 }

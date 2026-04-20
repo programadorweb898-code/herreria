@@ -23,7 +23,7 @@ export default function Navbar() {
 
   return (
     <header
-      className="fixed inset-x-0 top-0 z-50 border-b border-border bg-[#f7f7f5]/95 text-black backdrop-blur-sm"
+      className="sticky top-0 z-50 border-b border-border bg-[#f7f7f5]/95 text-black backdrop-blur-sm"
     >
       <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-5 sm:px-8 lg:px-12">
         <Link

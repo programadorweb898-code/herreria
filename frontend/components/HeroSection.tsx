@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function HeroSection() {
   return (
-    <section className="relative flex min-h-[92vh] items-end overflow-hidden border-b border-border bg-black pt-32">
+    <section className="relative flex min-h-[85vh] items-end overflow-hidden border-b border-border bg-black pt-12">
       <div className="absolute inset-0">
         <Image
           alt="Interior editorial con mobiliario de hierro y madera"

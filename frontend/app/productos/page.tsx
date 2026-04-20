@@ -25,7 +25,7 @@ const trabajos = [
 export default function NuestrosTrabajos() {
   return (
     <div className="bg-white">
-      <div className="mx-auto max-w-7xl px-6 pb-12 pt-32 sm:px-8 sm:pb-16 lg:px-12">
+      <div className="mx-auto max-w-7xl px-6 pb-12 pt-12 sm:px-8 sm:pb-16 lg:px-12">
         <div className="mb-16 max-w-2xl space-y-4">
           <p className="text-xs font-light uppercase tracking-[0.28em] text-accent">
             Portafolio
@@ -67,15 +67,6 @@ export default function NuestrosTrabajos() {
                     {trabajo.description}
                   </p>
                 </div>
-
-                <div className="mt-auto pt-4">
-                  <Link
-                    href="#footer"
-                    className="inline-block text-xs font-light uppercase tracking-[0.2em] text-accent hover:text-foreground transition"
-                  >
-                    Solicitar información →
-                  </Link>
-                </div>
               </div>
             </article>
           ))}
@@ -89,8 +80,8 @@ export default function NuestrosTrabajos() {
             ¿Tienes un proyecto en mente?
           </h2>
           <p className="text-base font-light text-slate-600 mb-8 max-w-2xl mx-auto">
-            Trabajamos con arquitectos, diseñadores e interioristas para desarrollar
-            soluciones metálicas personalizadas que transforman espacios.
+            Trabajamos con arquitectos e interioristas para desarrollar mobiliario industrial 
+            en hierro y madera que transforma cada espacio con precisión y calidez.
           </p>
           <Link
             href="/diseno-personalizado"

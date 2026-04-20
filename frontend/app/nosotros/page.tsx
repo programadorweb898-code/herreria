@@ -9,7 +9,7 @@ export default function QuienesSomosPage() {
   return (
     <div className="bg-white text-on-surface overflow-x-hidden">
       {/* Section 1: Hero */}
-      <section className="relative w-full h-[550px] md:h-[700px] overflow-hidden bg-black flex items-end px-6 pb-12 sm:px-8 sm:pb-16 lg:px-12 lg:pb-24 pt-20">
+      <section className="relative w-full h-[550px] md:h-[700px] overflow-hidden bg-black flex items-end px-6 pb-12 sm:px-8 sm:pb-16 lg:px-12 lg:pb-24 pt-8">
         <Image
           alt="Herrería Estudio - Nuestra Historia"
           className="absolute inset-0 object-cover"

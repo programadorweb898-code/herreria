@@ -41,7 +41,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   const message = `Hola! Me interesa: ${product.name} - Precio: $${formatWhatsAppPrice(product.price)}. Â¿Me podÃ©s dar mÃ¡s info?`;
 
   return (
-    <div className="mx-auto max-w-7xl px-6 pb-20 pt-32 sm:px-8 sm:pb-24 lg:px-12">
+    <div className="mx-auto max-w-7xl px-6 pb-20 pt-12 sm:px-8 sm:pb-24 lg:px-12">
       <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
         <ProductImageCarousel
           image={product.image}

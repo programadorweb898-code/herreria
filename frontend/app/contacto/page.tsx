@@ -10,7 +10,7 @@ export const metadata = {
 
 export default function ContactoPage() {
   return (
-    <div className="mx-auto max-w-5xl px-6 pb-20 pt-32 sm:px-8 sm:pb-24 lg:px-12">
+    <div className="mx-auto max-w-5xl px-6 pb-20 pt-12 sm:px-8 sm:pb-24 lg:px-12">
       <div className="flex flex-col items-center gap-8 border border-border px-8 py-16 text-center sm:px-12 sm:py-20">
         <p className="text-xs font-light uppercase tracking-[0.28em] text-accent">Contacto</p>
         <h1 className="max-w-3xl text-4xl font-semibold uppercase tracking-tight sm:text-5xl">

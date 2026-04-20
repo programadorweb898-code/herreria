@@ -114,7 +114,7 @@ export default function DisenoPersonalizadoPage() {
     if (productSlug === "perchero") {
       return {
         referenceImage: "/Estanteria-Tupungato-300x300.webp",
-        modelPath: "/models/base.glb",
+        modelPath: "/bodega-milan.glb",
         modelName: "Estantería Tupungato",
       };
     }
@@ -125,23 +125,30 @@ export default function DisenoPersonalizadoPage() {
         modelName: "Bodega Milán",
       };
     }
+    if (productSlug === "mesa-auxiliar-cubica") {
+      return {
+        referenceImage: "/dresuar-filadelfia.webp",
+        modelPath: "/models/dresuar-filadelfia.glb",
+        modelName: "Dresuar Filadelfia",
+      };
+    }
     return {
       referenceImage: null,
-      modelPath: undefined, // Usará el default (/models/base.glb)
+      modelPath: undefined, // Usará el default (/bodega-milan.glb)
       modelName: null,
     };
   }, [productSlug]);
 
   const initialWidth = useMemo(
-    () => Number(searchParams.get("width")) || (productSlug === "perchero" ? 100 : productSlug === "estanteria-pared-lineal" ? 60 : 100),
+    () => Number(searchParams.get("width")) || (productSlug === "perchero" ? 100 : productSlug === "estanteria-pared-lineal" ? 60 : productSlug === "mesa-auxiliar-cubica" ? 100 : 100),
     [searchParams, productSlug]
   );
   const initialHeight = useMemo(
-    () => Number(searchParams.get("height")) || (productSlug === "perchero" ? 180 : productSlug === "estanteria-pared-lineal" ? 40 : 100),
+    () => Number(searchParams.get("height")) || (productSlug === "perchero" ? 180 : productSlug === "estanteria-pared-lineal" ? 40 : productSlug === "mesa-auxiliar-cubica" ? 80 : 100),
     [searchParams, productSlug]
   );
   const initialDepth = useMemo(
-    () => Number(searchParams.get("depth")) || (productSlug === "perchero" ? 20 : productSlug === "estanteria-pared-lineal" ? 15 : 30),
+    () => Number(searchParams.get("depth")) || (productSlug === "perchero" ? 20 : productSlug === "estanteria-pared-lineal" ? 15 : productSlug === "mesa-auxiliar-cubica" ? 30 : 30),
     [searchParams, productSlug]
   );
 

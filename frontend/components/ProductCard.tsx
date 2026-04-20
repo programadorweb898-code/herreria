@@ -38,17 +38,17 @@ export default function ProductCard({ product }: ProductCardProps) {
           </Link>
         </div>
 
-        <div className="mt-auto pt-2 flex flex-col gap-2">
+        <div className="mt-auto pt-2 flex flex-col gap-3">
           <span className="mb-3 block text-lg font-bold tracking-[-0.03em] text-foreground">
             {formatPrice(product.price)}
           </span>
-          <WhatsAppButton className="w-full justify-center px-4 py-3 text-[10px]" message={message} phone={phone}>
+          <WhatsAppButton className="w-full justify-center px-6 py-4 text-[10px]" message={message} phone={phone}>
             Contactar por WhatsApp
           </WhatsAppButton>
-<Link 
-              href={`/diseno-personalizado?width=${product.width || 100}&height=${product.height || 100}&depth=${product.depth || 30}`}
-              className="inline-flex w-full items-center justify-center bg-black px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-white transition hover:bg-neutral-800"
-            >
+          <Link 
+            href={`/diseno-personalizado?width=${product.width || 100}&height=${product.height || 100}&depth=${product.depth || 30}`}
+            className="inline-flex w-full items-center justify-center bg-black px-6 py-4 text-[10px] font-semibold uppercase tracking-[0.22em] text-white transition hover:bg-neutral-800"
+          >
             Diseño personalizado
           </Link>
         </div>

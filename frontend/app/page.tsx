@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 import HeroSection from "@/components/HeroSection";
 import MarqueeBanner from "@/components/MarqueeBanner";
@@ -117,14 +118,20 @@ export default async function HomePage() {
           <h2 className="mb-10 text-4xl font-light tracking-[-0.04em] text-white sm:text-6xl">
             Integrá hierro, madera y precisión en tu próximo proyecto.
           </h2>
-          <div className="flex justify-center">
+          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <WhatsAppButton
-              className="border-white bg-white px-8 py-5 text-[10px] text-black hover:border-white/80 hover:bg-transparent hover:text-white"
+              className="w-full border-white bg-white px-8 py-5 text-[10px] text-black hover:border-white/80 hover:bg-transparent hover:text-white sm:w-auto"
               message="Hola! Me gustaría hacer una consulta."
               phone="+5491100000000"
             >
               Contactar por WhatsApp
             </WhatsAppButton>
+            <Link
+              href="/diseno-personalizado"
+              className="w-full border border-white px-8 py-5 text-[10px] font-semibold uppercase tracking-[0.22em] text-white transition hover:bg-white hover:text-black sm:w-auto"
+            >
+              Diseño personalizado
+            </Link>
           </div>
         </div>
       </section>

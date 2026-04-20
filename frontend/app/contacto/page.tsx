@@ -1,4 +1,5 @@
 import WhatsAppButton from "@/components/WhatsAppButton";
+import Link from "next/link";
 
 const phone = "+5491100000000";
 const message = "Hola! Me gustaría hacer una consulta.";
@@ -19,9 +20,17 @@ export default function ContactoPage() {
           Escribinos para consultar stock, terminaciones, medidas especiales o desarrollar
           un mueble a medida para tu espacio.
         </p>
-        <WhatsAppButton className="px-8 py-4" message={message} phone={phone}>
-          Abrir WhatsApp
-        </WhatsAppButton>
+        <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
+          <WhatsAppButton className="px-8 py-4 text-[11px]" message={message} phone={phone}>
+            Abrir WhatsApp
+          </WhatsAppButton>
+          <Link
+            href="/diseno-personalizado"
+            className="inline-flex items-center justify-center bg-black px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-white transition hover:bg-neutral-800"
+          >
+            Diseño personalizado
+          </Link>
+        </div>
       </div>
 
       <div className="mt-10 grid gap-px border border-border bg-border md:grid-cols-3">

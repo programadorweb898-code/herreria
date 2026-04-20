@@ -69,16 +69,16 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             </p>
           </div>
 
-          <div className="flex flex-col gap-4">
-            <WhatsAppButton className="w-full px-6 py-4" message={message} phone={phone}>
+          <div className="flex flex-col gap-3">
+            <WhatsAppButton className="w-full justify-center px-6 py-4 text-[10px]" message={message} phone={phone}>
               Consultar por WhatsApp
             </WhatsAppButton>
             
             <Link
               href={`/diseno-personalizado?product=${product.slug}&width=${product.width}&height=${product.height}&depth=${product.depth}`}
-              className="inline-block border border-foreground text-foreground px-6 py-4 font-semibold text-[10px] tracking-widest uppercase hover:bg-foreground hover:text-white transition-all text-center"
+              className="inline-flex w-full items-center justify-center bg-black px-6 py-4 text-[10px] font-semibold uppercase tracking-[0.22em] text-white transition hover:bg-neutral-800"
             >
-              Personalizar esta pieza
+              Diseño personalizado
             </Link>
           </div>
         </div>

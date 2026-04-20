@@ -22,11 +22,10 @@ export default function HeroSection() {
             Est. 2024
           </p>
           <h1 className="max-w-5xl text-4xl font-light uppercase leading-[0.88] tracking-[-0.05em] text-white sm:text-6xl lg:text-7xl">
-            Muebles de hierro para espacios de lenguaje contemporáneo.
+            Mobiliario industrial en hierro y madera para espacios contemporáneos.
           </h1>
           <p className="max-w-2xl text-base font-light leading-8 text-white sm:text-xl">
-            Diseñamos piezas sobrias para estudios, viviendas y proyectos que valoran la
-            estructura, la proporción y la permanencia material.
+            Diseñamos y fabricamos piezas a medida que combinan la robustez del metal con la calidez de la madera, priorizando la funcionalidad y el lenguaje arquitectónico.
           </p>
         </div>
 

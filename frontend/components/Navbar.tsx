@@ -84,24 +84,24 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu Dropdown */}
       <div 
-        className={`fixed inset-0 top-[72px] z-40 bg-[#f7f7f5] transition-transform duration-500 lg:hidden ${
-          isMenuOpen ? "translate-x-0" : "translate-x-full"
+        className={`overflow-hidden transition-all duration-300 ease-in-out lg:hidden ${
+          isMenuOpen ? "max-h-[500px] border-t border-border" : "max-h-0"
         }`}
       >
-        <nav className="flex flex-col items-center gap-10 p-12 text-sm font-light uppercase tracking-[0.3em]">
+        <nav className="flex flex-col items-center gap-8 p-8 text-[11px] font-light uppercase tracking-[0.24em]">
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-black"
+              className="text-black transition-colors hover:text-black/60"
             >
               {link.label}
             </Link>
           ))}
           <WhatsAppButton
-            className="mt-4 w-full justify-center border border-black px-6 py-4 text-[10px] text-black"
+            className="w-full justify-center border border-black px-6 py-4 text-[10px] text-black"
             message="Hola! Me gustaría hacer una consulta."
             phone="+5491100000000"
           >

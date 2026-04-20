@@ -38,23 +38,19 @@ export default function QuienesSomosPage() {
       <section className="py-16 md:py-24 lg:py-32 px-6 sm:px-8 lg:px-12 bg-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-5xl font-light tracking-tighter leading-[1.1] text-foreground mb-12">
-            Filosofía y Precisión
+            Diseño, Hierro y Madera
           </h2>
           <div className="space-y-6">
             <p className="text-lg md:text-xl font-light leading-relaxed text-slate-700">
-              En el corazón de Herrería Estudio reside una obsesión por la honestidad del material. 
-              Concebimos cada pieza como una estructura arquitectónica en miniatura, donde el hierro 
-              y el acero no son solo un medio, sino el mensaje mismo de perdurabilidad y rigor técnico.
+              En Herrería Estudio, fusionamos la robustez del hierro industrial con la calidez de maderas nobles para crear piezas únicas. Concebimos el mobiliario como una extensión de la arquitectura del lugar, donde cada detalle responde a una necesidad funcional y estética.
             </p>
             <p className="text-base font-light leading-[1.8] text-slate-600">
-              Combinamos la fuerza bruta del procesamiento metal mecánico con la delicadeza del acabado 
-              artesanal. Cada unión, cada pulido y cada arista es supervisada bajo estándares de precisión, 
-              asegurando que la visión del diseñador se traduzca fielmente en una realidad táctil y eterna.
+              Nuestros procesos combinan la precisión técnica de la metalurgia con la sensibilidad del trabajo artesanal en madera. Desde bibliotecas modulares hasta mesas de gran porte, cada pieza es diseñada bajo estándares de excelencia, asegurando durabilidad y un lenguaje visual coherente.
             </p>
             <div className="pt-8 flex flex-col items-center">
               <div className="h-px w-24 bg-foreground mb-4"></div>
               <span className="font-semibold text-[10px] tracking-widest uppercase text-foreground">
-                EL HIERRO COMO LENGUAJE
+                Mobiliario con Lenguaje Arquitectónico
               </span>
             </div>
           </div>
@@ -68,7 +64,7 @@ export default function QuienesSomosPage() {
             {/* Image Container with Float */}
             <div className="relative w-full md:w-[45%] h-[500px] md:h-[700px] md:float-left md:mr-16 mb-10 md:mb-4 group">
               <Image
-                alt="Planos y procesos - Herrería Estudio"
+                alt="Proceso de diseño y fabricación - Herrería Estudio"
                 className="w-full h-full object-cover shadow-2xl"
                 fill
                 sizes="(max-width: 768px) 100vw, 45vw"
@@ -77,7 +73,7 @@ export default function QuienesSomosPage() {
               <div className="absolute inset-0 border-[15px] border-white/5 pointer-events-none"></div>
               <div className="absolute bottom-6 left-6 right-6 bg-black/80 backdrop-blur-sm p-4 border-l-2 border-white">
                 <p className="text-white text-[11px] font-light tracking-wider uppercase">
-                  Documentación Técnica: Prototipado de Estructuras Industriales
+                  Desarrollo de Mobiliario a Medida e Industrial
                 </p>
               </div>
             </div>
@@ -85,30 +81,30 @@ export default function QuienesSomosPage() {
             {/* Text Content */}
             <div className="text-slate-800">
               <h3 className="text-4xl md:text-5xl lg:text-7xl font-extralight tracking-tighter mb-10 leading-none text-foreground">
-                Ingeniería en <br className="hidden md:block" /> Hierro y Acero
+                Diseño Industrial <br className="hidden md:block" /> Personalizado
               </h3>
               
               <div className="space-y-6 md:space-y-8 max-w-3xl">
                 <p className="text-lg md:text-xl font-medium leading-relaxed text-slate-900 border-l-4 border-foreground pl-6">
-                  Nuestra especialización en mobiliario industrial de alta gama nace de la precisión técnica. No fabricamos simples muebles; interpretamos planos arquitectónicos para crear estructuras que definen el carácter de un espacio.
+                  Nuestra especialización en mobiliario de estilo industrial nace del equilibrio entre materialidad y uso. Fabricamos piezas diseñadas para perdurar, adaptándonos a las medidas y necesidades específicas de cada espacio.
                 </p>
                 
                 <p className="text-base md:text-lg font-light leading-relaxed text-slate-600">
-                  En Herrería Estudio, cada proyecto es abordado como un desafío de ingeniería. Utilizamos procesos de soldadura certificados y acabados superficiales de grado industrial (powder coating y lacas automotrices) que garantizan una durabilidad excepcional en entornos de uso intensivo, ya sea en oficinas corporativas, locales comerciales de lujo o residencias modernas.
+                  Cada proyecto en Herrería Estudio es abordado con rigor técnico. Integramos estructuras metálicas soldadas con precisión y tapas de madera maciza seleccionada, aplicando acabados de alta resistencia como powder coating y lacas protectoras, ideales tanto para el hogar como para entornos comerciales de alta exigencia.
                 </p>
                 
                 <p className="text-base md:text-lg font-light leading-relaxed text-slate-600">
-                  Nuestra metodología integra la honestidad del material con la sofisticación del diseño contemporáneo. Al trabajar directamente sobre planos técnicos, aseguramos una fidelidad absoluta a la visión original del arquitecto, optimizando cada unión y cada soporte para lograr esa estética minimalista y robusta que caracteriza al auténtico estilo industrial.
+                  Optimizamos cada ensamble para lograr una estética minimalista sin sacrificar la robustez. Al trabajar de forma personalizada, permitimos a nuestros clientes y arquitectos definir dimensiones, tonalidades y configuraciones, resultando en muebles que son verdaderas soluciones espaciales.
                 </p>
 
                 <div className="grid grid-cols-2 gap-8 py-8 border-y border-slate-100 mt-8">
                   <div>
-                    <span className="block text-2xl font-light text-foreground">01. Rigor</span>
-                    <p className="text-xs uppercase tracking-widest text-slate-400 mt-1">Precisión Milimétrica</p>
+                    <span className="block text-2xl font-light text-foreground">01. Funcionalidad</span>
+                    <p className="text-xs uppercase tracking-widest text-slate-400 mt-1">Diseño para el Uso</p>
                   </div>
                   <div>
-                    <span className="block text-2xl font-light text-foreground">02. Oficio</span>
-                    <p className="text-xs uppercase tracking-widest text-slate-400 mt-1">Acabado Artesanal</p>
+                    <span className="block text-2xl font-light text-foreground">02. Materialidad</span>
+                    <p className="text-xs uppercase tracking-widest text-slate-400 mt-1">Hierro y Madera Noble</p>
                   </div>
                 </div>
 

@@ -109,19 +109,39 @@ export default function DisenoPersonalizadoPage() {
   const searchParams = useSearchParams();
   const productSlug = searchParams.get("product");
 
-  // Si el producto es "perchero" (Estantería Tupungato), mostramos su imagen de referencia
-  const referenceImage = productSlug === "perchero" ? "/Estanteria-Tupungato-300x300.webp" : null;
+  // Configuración según el producto seleccionado
+  const productConfig = useMemo(() => {
+    if (productSlug === "perchero") {
+      return {
+        referenceImage: "/Estanteria-Tupungato-300x300.webp",
+        modelPath: "/models/base.glb",
+        modelName: "Estantería Tupungato",
+      };
+    }
+    if (productSlug === "estanteria-pared-lineal") {
+      return {
+        referenceImage: "/bodega-milan.webp",
+        modelPath: "/bodega-milan.glb",
+        modelName: "Bodega Milán",
+      };
+    }
+    return {
+      referenceImage: null,
+      modelPath: undefined, // Usará el default (/models/base.glb)
+      modelName: null,
+    };
+  }, [productSlug]);
 
   const initialWidth = useMemo(
-    () => Number(searchParams.get("width")) || (productSlug === "perchero" ? 100 : 100),
+    () => Number(searchParams.get("width")) || (productSlug === "perchero" ? 100 : productSlug === "estanteria-pared-lineal" ? 60 : 100),
     [searchParams, productSlug]
   );
   const initialHeight = useMemo(
-    () => Number(searchParams.get("height")) || (productSlug === "perchero" ? 180 : 100),
+    () => Number(searchParams.get("height")) || (productSlug === "perchero" ? 180 : productSlug === "estanteria-pared-lineal" ? 40 : 100),
     [searchParams, productSlug]
   );
   const initialDepth = useMemo(
-    () => Number(searchParams.get("depth")) || (productSlug === "perchero" ? 20 : 30),
+    () => Number(searchParams.get("depth")) || (productSlug === "perchero" ? 20 : productSlug === "estanteria-pared-lineal" ? 15 : 30),
     [searchParams, productSlug]
   );
 
@@ -138,11 +158,12 @@ export default function DisenoPersonalizadoPage() {
               width={width / 100} 
               height={height / 100} 
               depth={depth / 100} 
+              modelPath={productConfig.modelPath}
             />
-            {referenceImage && (
+            {productConfig.referenceImage && (
               <div className="absolute top-4 right-4 w-32 h-32 md:w-48 md:h-48 border-2 border-white shadow-xl overflow-hidden z-10 transition-transform hover:scale-105">
                 <img 
-                  src={referenceImage} 
+                  src={productConfig.referenceImage} 
                   alt="Referencia real" 
                   className="w-full h-full object-cover"
                 />
@@ -152,10 +173,10 @@ export default function DisenoPersonalizadoPage() {
               </div>
             )}
           </div>
-          {productSlug === "perchero" && (
+          {productConfig.modelName && (
             <div className="bg-slate-50 p-4 border-l-4 border-foreground">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-accent mb-1">Modelo Seleccionado</p>
-              <p className="text-sm font-medium">Estantería Tupungato - Basado en base_basic_shaded.glb</p>
+              <p className="text-sm font-medium">{productConfig.modelName}</p>
             </div>
           )}
         </div>

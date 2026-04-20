@@ -61,52 +61,68 @@ export default function QuienesSomosPage() {
         </div>
       </section>
 
-      {/* Section 3: Nuestra Misión */}
-      <section className="pb-16 md:pb-24 lg:pb-32 px-6 sm:px-8 lg:px-12 bg-slate-50">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-0 border border-slate-200 items-stretch">
-          {/* Left: Image */}
-          <div className="bg-slate-100 overflow-hidden h-96 md:h-full min-h-[500px] relative">
-            <Image
-              alt="Proceso de fabricación - Herrería Estudio"
-              className="w-full h-full object-cover"
-              fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              src="/Gemini_Generated_Image_6fjvaz6fjvaz6fjv.png"
-            />
-          </div>
+      {/* Section 3: Ingeniería y Proceso */}
+      <section className="py-16 md:py-24 lg:py-32 px-6 sm:px-8 lg:px-12 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="md:flow-root">
+            {/* Image Container with Float */}
+            <div className="relative w-full md:w-[45%] h-[500px] md:h-[700px] md:float-left md:mr-16 mb-10 md:mb-4 group">
+              <Image
+                alt="Planos y procesos - Herrería Estudio"
+                className="w-full h-full object-cover shadow-2xl"
+                fill
+                sizes="(max-width: 768px) 100vw, 45vw"
+                src="/Gemini_Generated_Image_6fjvaz6fjvaz6fjv.png"
+              />
+              <div className="absolute inset-0 border-[15px] border-white/5 pointer-events-none"></div>
+              <div className="absolute bottom-6 left-6 right-6 bg-black/80 backdrop-blur-sm p-4 border-l-2 border-white">
+                <p className="text-white text-[11px] font-light tracking-wider uppercase">
+                  Documentación Técnica: Prototipado de Estructuras Industriales
+                </p>
+              </div>
+            </div>
 
-          {/* Right: Content */}
-          <div className="flex flex-col justify-center p-8 md:p-12 lg:p-20 bg-foreground text-white">
-            <h3 className="text-4xl md:text-5xl lg:text-6xl font-extralight tracking-tighter mb-8 md:mb-12 leading-tight">
-              Nuestra Misión
-            </h3>
-            <div className="space-y-8 md:space-y-12">
-              <div>
-                <span className="block font-semibold text-[10px] tracking-widest uppercase text-white/50 mb-2">
-                  COLABORACIÓN ESTRATÉGICA
-                </span>
-                <p className="text-base md:text-lg font-light leading-relaxed">
-                  Actuamos como el brazo técnico de arquitectos y diseñadores. Nuestra misión es simple 
-                  pero radical: eliminar las fricciones entre el concepto creativo y la ejecución física 
-                  mediante el dominio del hierro y el acero.
+            {/* Text Content */}
+            <div className="text-slate-800">
+              <h3 className="text-4xl md:text-5xl lg:text-7xl font-extralight tracking-tighter mb-10 leading-none text-foreground">
+                Ingeniería en <br className="hidden md:block" /> Hierro y Acero
+              </h3>
+              
+              <div className="space-y-6 md:space-y-8 max-w-3xl">
+                <p className="text-lg md:text-xl font-medium leading-relaxed text-slate-900 border-l-4 border-foreground pl-6">
+                  Nuestra especialización en mobiliario industrial de alta gama nace de la precisión técnica. No fabricamos simples muebles; interpretamos planos arquitectónicos para crear estructuras que definen el carácter de un espacio.
                 </p>
-              </div>
-              <div>
-                <span className="block font-semibold text-[10px] tracking-widest uppercase text-white/50 mb-2">
-                  PRECISIÓN SIN CONCESIONES
-                </span>
-                <p className="text-base md:text-lg font-light leading-relaxed">
-                  Ofrecemos una infraestructura capaz de prototipar y producir mobiliario y elementos 
-                  estructurales que desafían los límites de la manufactura convencional.
+                
+                <p className="text-base md:text-lg font-light leading-relaxed text-slate-600">
+                  En Herrería Estudio, cada proyecto es abordado como un desafío de ingeniería. Utilizamos procesos de soldadura certificados y acabados superficiales de grado industrial (powder coating y lacas automotrices) que garantizan una durabilidad excepcional en entornos de uso intensivo, ya sea en oficinas corporativas, locales comerciales de lujo o residencias modernas.
                 </p>
-              </div>
-              <div className="pt-4">
-                <Link 
-                  href="/productos" 
-                  className="inline-block bg-white text-foreground px-8 py-3 font-semibold text-[10px] tracking-widest uppercase hover:bg-slate-100 transition-all duration-100"
-                >
-                  Ver Nuestros Trabajos
-                </Link>
+                
+                <p className="text-base md:text-lg font-light leading-relaxed text-slate-600">
+                  Nuestra metodología integra la honestidad del material con la sofisticación del diseño contemporáneo. Al trabajar directamente sobre planos técnicos, aseguramos una fidelidad absoluta a la visión original del arquitecto, optimizando cada unión y cada soporte para lograr esa estética minimalista y robusta que caracteriza al auténtico estilo industrial.
+                </p>
+
+                <div className="grid grid-cols-2 gap-8 py-8 border-y border-slate-100 mt-8">
+                  <div>
+                    <span className="block text-2xl font-light text-foreground">01. Rigor</span>
+                    <p className="text-xs uppercase tracking-widest text-slate-400 mt-1">Precisión Milimétrica</p>
+                  </div>
+                  <div>
+                    <span className="block text-2xl font-light text-foreground">02. Oficio</span>
+                    <p className="text-xs uppercase tracking-widest text-slate-400 mt-1">Acabado Artesanal</p>
+                  </div>
+                </div>
+
+                <div className="pt-6">
+                  <Link 
+                    href="/productos" 
+                    className="inline-flex items-center gap-4 group text-foreground font-semibold text-[10px] tracking-widest uppercase"
+                  >
+                    <span className="bg-foreground text-white px-8 py-4 group-hover:bg-slate-800 transition-colors">
+                      Ver Proyectos Industriales
+                    </span>
+                    <span className="h-px w-12 bg-foreground group-hover:w-20 transition-all"></span>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

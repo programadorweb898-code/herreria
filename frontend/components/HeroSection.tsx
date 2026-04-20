@@ -3,15 +3,15 @@ import Link from "next/link";
 
 export default function HeroSection() {
   return (
-    <section className="relative flex min-h-[92vh] items-end overflow-hidden border-b border-border bg-neutral-950 pt-32">
+    <section className="relative flex min-h-[92vh] items-end overflow-hidden border-b border-border bg-black pt-32">
       <div className="absolute inset-0">
         <Image
           alt="Interior editorial con mobiliario de hierro y madera"
-          className="object-cover grayscale"
+          className="object-cover"
           fill
           priority
           sizes="100vw"
-          src="/Gemini_Generated_Image_wu8j42wu8j42wu8j.png"
+          src="/Muebles_Estilo_Insdustrial_4.jpg"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10" />
       </div>
@@ -21,10 +21,10 @@ export default function HeroSection() {
           <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-white/65">
             Est. 2024
           </p>
-          <h1 className="max-w-5xl text-5xl font-light uppercase leading-[0.88] tracking-[-0.05em] text-white sm:text-6xl lg:text-8xl">
+          <h1 className="max-w-5xl text-4xl font-light uppercase leading-[0.88] tracking-[-0.05em] text-white sm:text-6xl lg:text-7xl">
             Muebles de hierro para espacios de lenguaje contemporáneo.
           </h1>
-          <p className="max-w-2xl text-base font-light leading-8 text-white/80 sm:text-xl">
+          <p className="max-w-2xl text-base font-light leading-8 text-white sm:text-xl">
             Diseñamos piezas sobrias para estudios, viviendas y proyectos que valoran la
             estructura, la proporción y la permanencia material.
           </p>

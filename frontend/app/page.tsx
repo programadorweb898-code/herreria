@@ -86,39 +86,25 @@ export default async function HomePage() {
       <section className="border-y border-border bg-white px-6 py-24 sm:px-8 lg:px-12">
         <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-10 lg:grid-cols-[0.95fr_1.05fr]">
           <div className="flex flex-col justify-center gap-6 pr-0 lg:pr-10">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-slate-400">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/50">
               Estudio
             </p>
-            <h2 className="text-4xl font-light uppercase tracking-[-0.04em] text-foreground sm:text-5xl">
+            <h2 className="text-4xl font-medium uppercase tracking-[-0.04em] text-foreground sm:text-5xl">
               Precisión industrial con sensibilidad espacial.
             </h2>
             <p className="max-w-xl text-base font-light leading-8 text-slate-500">
               Nuestro trabajo parte de la estructura. Cada mesa, biblioteca o perchero se define por
               su presencia material, su equilibrio visual y la manera en que habita el espacio.
             </p>
-            <div className="flex flex-col gap-4 sm:flex-row">
-              <Link
-                className="inline-flex border border-foreground px-6 py-4 text-[11px] font-semibold uppercase tracking-[0.22em] transition hover:border-accent hover:text-accent"
-                href="/nosotros"
-              >
-                Quiénes somos
-              </Link>
-              <Link
-                className="inline-flex border border-border px-6 py-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-600 transition hover:border-foreground hover:text-foreground"
-                href="/contacto"
-              >
-                Iniciar proyecto
-              </Link>
-            </div>
           </div>
 
           <div className="relative min-h-[420px] overflow-hidden border border-border bg-slate-100">
             <Image
               alt="Ambiente con muebles de hierro de lenguaje arquitectónico"
-              className="object-cover grayscale"
+              className="object-cover"
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
-              src="/Gemini_Generated_Image_9mrj8j9mrj8j9mrj.png"
+              src="/Gemini_Generated_Image_yyzrylyyzrylyyzr.png"
             />
           </div>
         </div>

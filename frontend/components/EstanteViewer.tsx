@@ -6,20 +6,22 @@ import { Center, OrbitControls, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import type { GLTF } from "three-stdlib";
 
-const MODEL_PATH = "/models/base_basic_shaded.glb";
+const DEFAULT_MODEL_PATH = "/models/base.glb";
 
 interface Props {
   width?: number;
   height?: number;
   depth?: number;
+  modelPath?: string;
 }
 
 function EstanteModel({
   width = 1,
   height = 1,
   depth = 1,
+  modelPath = DEFAULT_MODEL_PATH,
 }: Props) {
-  const gltf = useGLTF(MODEL_PATH) as GLTF;
+  const gltf = useGLTF(modelPath) as GLTF;
   const sourceScene: THREE.Group | null = gltf?.scene ?? null;
 
   const clonedScene = useMemo(() => {
@@ -58,6 +60,7 @@ export default function EstanteViewer({
   width = 1,
   height = 1,
   depth = 1,
+  modelPath = DEFAULT_MODEL_PATH,
 }: Props) {
   return (
     <div className="h-[500px] w-full overflow-hidden bg-zinc-900">
@@ -66,7 +69,7 @@ export default function EstanteViewer({
           <ambientLight intensity={1} />
           <directionalLight position={[5, 5, 5]} intensity={1} />
           <Center>
-            <EstanteModel width={width} height={height} depth={depth} />
+            <EstanteModel width={width} height={height} depth={depth} modelPath={modelPath} />
           </Center>
           <OrbitControls enableDamping />
         </Canvas>
@@ -75,4 +78,4 @@ export default function EstanteViewer({
   );
 }
 
-useGLTF.preload(MODEL_PATH);
+useGLTF.preload(DEFAULT_MODEL_PATH);

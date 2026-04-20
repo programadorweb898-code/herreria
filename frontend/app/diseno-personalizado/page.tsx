@@ -107,18 +107,22 @@ function NumberInput({
 
 export default function DisenoPersonalizadoPage() {
   const searchParams = useSearchParams();
+  const productSlug = searchParams.get("product");
+
+  // Si el producto es "perchero" (Estantería Tupungato), mostramos su imagen de referencia
+  const referenceImage = productSlug === "perchero" ? "/Estanteria-Tupungato-300x300.webp" : null;
 
   const initialWidth = useMemo(
-    () => Number(searchParams.get("width")) || 100,
-    [searchParams]
+    () => Number(searchParams.get("width")) || (productSlug === "perchero" ? 100 : 100),
+    [searchParams, productSlug]
   );
   const initialHeight = useMemo(
-    () => Number(searchParams.get("height")) || 100,
-    [searchParams]
+    () => Number(searchParams.get("height")) || (productSlug === "perchero" ? 180 : 100),
+    [searchParams, productSlug]
   );
   const initialDepth = useMemo(
-    () => Number(searchParams.get("depth")) || 30,
-    [searchParams]
+    () => Number(searchParams.get("depth")) || (productSlug === "perchero" ? 20 : 30),
+    [searchParams, productSlug]
   );
 
   const [width, setWidth] = useState(initialWidth);
@@ -128,12 +132,32 @@ export default function DisenoPersonalizadoPage() {
   return (
     <div className="mx-auto max-w-5xl px-6 pb-20 pt-32 sm:px-8 sm:pb-24 lg:px-12">
       <section className="mb-10 grid gap-px border border-border bg-border lg:grid-cols-[1.6fr_1fr]">
-        <div className="bg-white p-4 sm:p-6">
-          <EstanteViewer 
-            width={width / 100} 
-            height={height / 100} 
-            depth={depth / 100} 
-          />
+        <div className="bg-white p-6 sm:p-8 flex flex-col gap-6">
+          <div className="relative group">
+            <EstanteViewer 
+              width={width / 100} 
+              height={height / 100} 
+              depth={depth / 100} 
+            />
+            {referenceImage && (
+              <div className="absolute top-4 right-4 w-32 h-32 md:w-48 md:h-48 border-2 border-white shadow-xl overflow-hidden z-10 transition-transform hover:scale-105">
+                <img 
+                  src={referenceImage} 
+                  alt="Referencia real" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[8px] uppercase tracking-widest p-1 text-center">
+                  Referencia Real
+                </div>
+              </div>
+            )}
+          </div>
+          {productSlug === "perchero" && (
+            <div className="bg-slate-50 p-4 border-l-4 border-foreground">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-accent mb-1">Modelo Seleccionado</p>
+              <p className="text-sm font-medium">Estantería Tupungato - Basado en base_basic_shaded.glb</p>
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col justify-center gap-8 bg-white px-6 py-8 sm:px-8 sm:py-10">

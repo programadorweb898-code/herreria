@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 
 import WhatsAppButton from "@/components/WhatsAppButton";
 import ProductImageCarousel from "@/components/ProductImageCarousel";
@@ -68,10 +69,17 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             </p>
           </div>
 
-          <div>
-            <WhatsAppButton className="px-6 py-4" message={message} phone={phone}>
+          <div className="flex flex-col gap-4">
+            <WhatsAppButton className="w-full px-6 py-4" message={message} phone={phone}>
               Consultar por WhatsApp
             </WhatsAppButton>
+            
+            <Link
+              href={`/diseno-personalizado?product=${product.slug}&width=${product.width}&height=${product.height}&depth=${product.depth}`}
+              className="inline-block border border-foreground text-foreground px-6 py-4 font-semibold text-[10px] tracking-widest uppercase hover:bg-foreground hover:text-white transition-all text-center"
+            >
+              Personalizar esta pieza
+            </Link>
           </div>
         </div>
       </div>

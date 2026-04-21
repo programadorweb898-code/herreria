@@ -56,16 +56,44 @@ export default function EstanteViewer({
   modelPath = null,
 }: Props) {
   return (
-    <div className="h-[500px] w-full overflow-hidden bg-zinc-900 shadow-inner">
+    <div className="h-[500px] w-full overflow-hidden bg-[#f8f8f8] rounded-xl border border-slate-200 shadow-sm relative">
+      <div className="absolute top-4 left-4 z-10">
+        <div className="bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full border border-slate-200 shadow-sm">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2">
+            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+            Vista 3D Interactiva
+          </p>
+        </div>
+      </div>
       <Suspense fallback={<ViewerFallback />}>
         <Canvas 
-          key={modelPath} // Forzamos el remount si el path cambia para evitar glitches
-          camera={{ position: [2, 2, 2], fov: 50 }}
+          key={modelPath}
+          camera={{ position: [3, 2, 3], fov: 45 }}
+          shadows
+          gl={{ antialias: true, preserveDrawingBuffer: true }}
         >
-          <ambientLight intensity={1.5} />
-          <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={2} />
-          <pointLight position={[-10, -10, -10]} intensity={1} />
-          <Center>
+          <color attach="background" args={["#f8f8f8"]} />
+          <fog attach="fog" args={["#f8f8f8", 5, 15]} />
+          
+          <ambientLight intensity={0.8} />
+          
+          {/* Main Studio Light */}
+          <spotLight 
+            position={[5, 8, 5]} 
+            angle={0.3} 
+            penumbra={1} 
+            intensity={2} 
+            castShadow 
+            shadow-mapSize={[2048, 2048]}
+          />
+          
+          {/* Rim Light */}
+          <pointLight position={[-5, 5, -5]} intensity={1} color="#ffffff" />
+          
+          {/* Fill Light */}
+          <directionalLight position={[0, -2, 4]} intensity={0.5} />
+
+          <Center top>
             <EstanteModel 
               width={width} 
               height={height} 
@@ -73,11 +101,20 @@ export default function EstanteViewer({
               modelPath={modelPath} 
             />
           </Center>
+
+          {/* Ground Shadow Plane */}
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
+            <planeGeometry args={[20, 20]} />
+            <shadowMaterial transparent opacity={0.1} />
+          </mesh>
+
           <OrbitControls 
             enableDamping 
+            dampingFactor={0.05}
             makeDefault 
-            minDistance={1}
-            maxDistance={8}
+            minDistance={1.5}
+            maxDistance={6}
+            maxPolarAngle={Math.PI / 1.7}
           />
         </Canvas>
       </Suspense>

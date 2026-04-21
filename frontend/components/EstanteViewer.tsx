@@ -6,7 +6,7 @@ import { Center, OrbitControls, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import type { GLTF } from "three-stdlib";
 
-const DEFAULT_MODEL_PATH = "/bodega-milan.glb";
+const DEFAULT_MODEL_PATH = "/models/Estanteria.glb";
 
 interface Props {
   width?: number;

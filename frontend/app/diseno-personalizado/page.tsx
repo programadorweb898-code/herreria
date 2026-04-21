@@ -114,14 +114,14 @@ export default function DisenoPersonalizadoPage() {
     if (productSlug === "perchero") {
       return {
         referenceImage: "/Estanteria-Tupungato-300x300.webp",
-        modelPath: "/bodega-milan.glb",
+        modelPath: "/models/Estanteria.glb",
         modelName: "Estantería Tupungato",
       };
     }
     if (productSlug === "estanteria-pared-lineal") {
       return {
         referenceImage: "/bodega-milan.webp",
-        modelPath: "/bodega-milan.glb",
+        modelPath: "/models/Estanteria.glb",
         modelName: "Bodega Milán",
       };
     }
@@ -134,7 +134,7 @@ export default function DisenoPersonalizadoPage() {
     }
     return {
       referenceImage: null,
-      modelPath: undefined, // Usará el default (/bodega-milan.glb)
+      modelPath: undefined, // Usará el default (/models/Estanteria.glb)
       modelName: null,
     };
   }, [productSlug]);

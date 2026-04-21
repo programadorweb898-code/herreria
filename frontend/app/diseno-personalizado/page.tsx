@@ -1,11 +1,12 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState, useMemo, useEffect } from "react";
+import Image from "next/image";
 
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { getProduct, getProducts } from "@/data/products";
+import { getProduct } from "@/data/products";
 import type { Product } from "@/types/product";
 
 const EstanteViewer = dynamic(() => import("@/components/EstanteViewer"), {
@@ -156,10 +157,11 @@ export default function DisenoPersonalizadoPage() {
             />
             {product?.image && (
               <div className="absolute top-4 right-4 w-32 h-32 md:w-48 md:h-48 border-2 border-white shadow-xl overflow-hidden z-10 transition-transform hover:scale-105">
-                <img 
+                <Image 
                   src={product.image} 
                   alt={product.name} 
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                 />
                 <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[8px] uppercase tracking-widest p-1 text-center">
                   Referencia Real

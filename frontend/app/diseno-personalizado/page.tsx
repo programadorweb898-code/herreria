@@ -2,9 +2,11 @@
 
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 import WhatsAppButton from "@/components/WhatsAppButton";
+import { getProduct } from "@/data/products";
+import type { Product } from "@/types/product";
 
 const EstanteViewer = dynamic(() => import("@/components/EstanteViewer"), {
   ssr: false,
@@ -108,53 +110,38 @@ function NumberInput({
 export default function DisenoPersonalizadoPage() {
   const searchParams = useSearchParams();
   const productSlug = searchParams.get("product");
-
-  // Configuración según el producto seleccionado
-  const productConfig = useMemo(() => {
-    if (productSlug === "perchero") {
-      return {
-        referenceImage: "/Estanteria-Tupungato-300x300.webp",
-        modelPath: "/models/Estanteria.glb",
-        modelName: "Estantería Tupungato",
-      };
-    }
-    if (productSlug === "estanteria-pared-lineal") {
-      return {
-        referenceImage: "/bodega-milan.webp",
-        modelPath: "/models/Estanteria.glb",
-        modelName: "Bodega Milán",
-      };
-    }
-    if (productSlug === "mesa-auxiliar-cubica") {
-      return {
-        referenceImage: "/dresuar-filadelfia.webp",
-        modelPath: "/models/dresuar-filadelfia.glb",
-        modelName: "Dresuar Filadelfia",
-      };
-    }
-    return {
-      referenceImage: null,
-      modelPath: undefined, // Usará el default (/models/Estanteria.glb)
-      modelName: null,
-    };
-  }, [productSlug]);
+  const [product, setProduct] = useState<Product | null>(null);
 
   const initialWidth = useMemo(
-    () => Number(searchParams.get("width")) || (productSlug === "perchero" ? 100 : productSlug === "estanteria-pared-lineal" ? 60 : productSlug === "mesa-auxiliar-cubica" ? 100 : 100),
-    [searchParams, productSlug]
+    () => Number(searchParams.get("width")) || 100,
+    [searchParams]
   );
   const initialHeight = useMemo(
-    () => Number(searchParams.get("height")) || (productSlug === "perchero" ? 180 : productSlug === "estanteria-pared-lineal" ? 40 : productSlug === "mesa-auxiliar-cubica" ? 80 : 100),
-    [searchParams, productSlug]
+    () => Number(searchParams.get("height")) || 100,
+    [searchParams]
   );
   const initialDepth = useMemo(
-    () => Number(searchParams.get("depth")) || (productSlug === "perchero" ? 20 : productSlug === "estanteria-pared-lineal" ? 15 : productSlug === "mesa-auxiliar-cubica" ? 30 : 30),
-    [searchParams, productSlug]
+    () => Number(searchParams.get("depth")) || 30,
+    [searchParams]
   );
 
   const [width, setWidth] = useState(initialWidth);
   const [height, setHeight] = useState(initialHeight);
   const [depth, setDepth] = useState(initialDepth);
+
+  useEffect(() => {
+    if (productSlug) {
+      void getProduct(productSlug).then((p) => {
+        if (p) {
+          setProduct(p);
+          // Solo actualizamos si no vienen por URL para no pisar el link del producto
+          if (!searchParams.get("width")) setWidth(p.width || 100);
+          if (!searchParams.get("height")) setHeight(p.height || 100);
+          if (!searchParams.get("depth")) setDepth(p.depth || 30);
+        }
+      });
+    }
+  }, [productSlug, searchParams]);
 
   return (
     <div className="mx-auto max-w-5xl px-6 pb-20 pt-32 sm:px-8 sm:pb-24 lg:px-12">
@@ -165,13 +152,13 @@ export default function DisenoPersonalizadoPage() {
               width={width / 100} 
               height={height / 100} 
               depth={depth / 100} 
-              modelPath={productConfig.modelPath}
+              modelPath={product?.modelPath}
             />
-            {productConfig.referenceImage && (
+            {product?.image && (
               <div className="absolute top-4 right-4 w-32 h-32 md:w-48 md:h-48 border-2 border-white shadow-xl overflow-hidden z-10 transition-transform hover:scale-105">
                 <img 
-                  src={productConfig.referenceImage} 
-                  alt="Referencia real" 
+                  src={product.image} 
+                  alt={product.name} 
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[8px] uppercase tracking-widest p-1 text-center">
@@ -180,10 +167,10 @@ export default function DisenoPersonalizadoPage() {
               </div>
             )}
           </div>
-          {productConfig.modelName && (
+          {product && (
             <div className="bg-slate-50 p-4 border-l-4 border-foreground">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-accent mb-1">Modelo Seleccionado</p>
-              <p className="text-sm font-medium">{productConfig.modelName}</p>
+              <p className="text-sm font-medium">{product.name}</p>
             </div>
           )}
         </div>

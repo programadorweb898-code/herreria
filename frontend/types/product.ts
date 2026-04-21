@@ -12,4 +12,5 @@ export interface Product {
   width?: number;
   height?: number;
   depth?: number;
+  modelPath?: string;
 }

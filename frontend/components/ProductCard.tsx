@@ -46,7 +46,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             Contactar por WhatsApp
           </WhatsAppButton>
           <Link 
-            href={`/diseno-personalizado?width=${product.width || 100}&height=${product.height || 100}&depth=${product.depth || 30}`}
+            href={`/diseno-personalizado?product=${product.slug}&width=${product.width || 100}&height=${product.height || 100}&depth=${product.depth || 30}`}
             className="inline-flex w-full items-center justify-center bg-black px-6 py-4 text-[10px] font-semibold uppercase tracking-[0.22em] text-white transition hover:bg-neutral-800"
           >
             Diseño personalizado

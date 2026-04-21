@@ -12,46 +12,39 @@ interface Props {
   width?: number;
   height?: number;
   depth?: number;
-  modelPath?: string;
+  modelPath?: string | null;
 }
 
 function EstanteModel({
   width = 1,
   height = 1,
   depth = 1,
-  modelPath = DEFAULT_MODEL_PATH,
+  modelPath,
 }: Props) {
-  const gltf = useGLTF(modelPath) as GLTF;
+  const path = modelPath || DEFAULT_MODEL_PATH;
+  const gltf = useGLTF(path) as GLTF;
   const sourceScene: THREE.Group | null = gltf?.scene ?? null;
 
   const clonedScene = useMemo(() => {
-    if (!sourceScene) {
-      return null;
-    }
-
+    if (!sourceScene) return null;
     return sourceScene.clone(true);
   }, [sourceScene]);
 
   useEffect(() => {
-    if (!clonedScene) {
-      return;
-    }
-
+    if (!clonedScene) return;
     clonedScene.scale.set(width, height, depth);
     clonedScene.updateMatrixWorld(true);
   }, [clonedScene, depth, height, width]);
 
-  if (!sourceScene || !clonedScene) {
-    return null;
-  }
+  if (!sourceScene || !clonedScene) return null;
 
   return <primitive object={clonedScene} />;
 }
 
 function ViewerFallback() {
   return (
-    <div className="flex h-full w-full items-center justify-center px-6 text-center text-sm uppercase tracking-[0.18em] text-white/60">
-      Cargando visor 3D
+    <div className="flex h-full w-full items-center justify-center bg-zinc-900 px-6 text-center text-sm uppercase tracking-[0.18em] text-white/60">
+      Cargando visor 3D...
     </div>
   );
 }
@@ -60,18 +53,32 @@ export default function EstanteViewer({
   width = 1,
   height = 1,
   depth = 1,
-  modelPath = DEFAULT_MODEL_PATH,
+  modelPath = null,
 }: Props) {
   return (
-    <div className="h-[500px] w-full overflow-hidden bg-zinc-900">
+    <div className="h-[500px] w-full overflow-hidden bg-zinc-900 shadow-inner">
       <Suspense fallback={<ViewerFallback />}>
-        <Canvas camera={{ position: [2, 2, 2], fov: 50 }}>
-          <ambientLight intensity={1} />
-          <directionalLight position={[5, 5, 5]} intensity={1} />
+        <Canvas 
+          key={modelPath} // Forzamos el remount si el path cambia para evitar glitches
+          camera={{ position: [2, 2, 2], fov: 50 }}
+        >
+          <ambientLight intensity={1.5} />
+          <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={2} />
+          <pointLight position={[-10, -10, -10]} intensity={1} />
           <Center>
-            <EstanteModel width={width} height={height} depth={depth} modelPath={modelPath} />
+            <EstanteModel 
+              width={width} 
+              height={height} 
+              depth={depth} 
+              modelPath={modelPath} 
+            />
           </Center>
-          <OrbitControls enableDamping />
+          <OrbitControls 
+            enableDamping 
+            makeDefault 
+            minDistance={1}
+            maxDistance={8}
+          />
         </Canvas>
       </Suspense>
     </div>

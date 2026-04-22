@@ -167,10 +167,10 @@ export default function DisenoPersonalizadoPage() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl px-6 pb-20 pt-32 sm:px-8 sm:pb-24 lg:px-12">
-      <section className="mb-10 grid gap-px border border-border bg-border lg:grid-cols-[1.6fr_1fr]">
-        <div className="bg-white p-6 sm:p-8 flex flex-col gap-6">
-          <div className="relative group">
+    <div className="mx-auto max-w-5xl px-4 pb-20 pt-28 sm:px-6 md:pt-32 lg:px-8">
+      <section className="mb-10 grid gap-px border border-border bg-border md:grid-cols-[1.2fr_0.8fr] lg:grid-cols-[1.4fr_1fr] overflow-hidden">
+        <div className="bg-white p-4 sm:p-6 md:p-8 flex flex-col gap-6 overflow-hidden">
+          <div className="relative group w-full">
             <EstanteViewer 
               width={width / 100} 
               height={height / 100} 
@@ -178,14 +178,14 @@ export default function DisenoPersonalizadoPage() {
               modelPath={product?.modelPath}
             />
             {product?.image && (
-              <div className="absolute top-4 right-4 w-32 h-32 md:w-48 md:h-48 border-2 border-white shadow-xl overflow-hidden z-10 transition-transform hover:scale-105">
+              <div className="absolute top-4 right-4 w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 border-2 border-white shadow-xl overflow-hidden z-10 transition-transform hover:scale-105">
                 <Image 
                   src={product.image} 
                   alt={product.name} 
                   fill
                   className="object-cover"
                 />
-                <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[8px] uppercase tracking-widest p-1 text-center">
+                <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[7px] uppercase tracking-widest p-1 text-center">
                   Referencia Real
                 </div>
               </div>

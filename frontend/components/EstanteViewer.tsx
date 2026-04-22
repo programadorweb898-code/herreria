@@ -27,73 +27,79 @@ function EstanteModel({
 
   const clonedScene = useMemo(() => {
     if (!sourceScene) return null;
-    return sourceScene.clone(true);
-  }, [sourceScene]);
+    
+    // Clonamos la escena original para no mutar el modelo base
+    const scene = sourceScene.clone(true);
+    
+    // Aplicamos el escalado base al contenedor principal
+    scene.scale.set(width, height, depth);
 
-  useEffect(() => {
-    if (!clonedScene) return;
+    // Función recursiva para procesar objetos y evitar doble escalado en adornos
+    const processObject = (obj: THREE.Object3D) => {
+      const name = obj.name.toLowerCase();
+      
+      // 1. Detección exhaustiva de ADORNOS (No deben deformarse)
+      const isAdorno = 
+        name.includes("vino") || name.includes("botella") || name.includes("bottle") || 
+        name.includes("decor") || name.includes("adorno") || name.includes("glass") || 
+        name.includes("copa") || name.includes("planta") || name.includes("plant") ||
+        name.includes("libro") || name.includes("book") || name.includes("percha") ||
+        name.includes("hanger") || name.includes("zapat") || name.includes("shoe") ||
+        name.includes("objeto") || name.includes("object") || name.includes("maceta") ||
+        name.includes("cuadro") || name.includes("frame") || name.includes("lamp") ||
+        name.includes("vela") || name.includes("candle") || name.includes("vaso") ||
+        name.includes("pot") || name.includes("comida") || name.includes("food") ||
+        name.includes("canasto") || name.includes("basket") || name.includes("tv") ||
+        name.includes("parlante") || name.includes("speaker");
 
-    // Escala base para el contenedor principal
-    clonedScene.scale.set(width, height, depth);
+      if (isAdorno) {
+        // Compensamos la escala del padre manteniendo la escala original del objeto
+        // Si el objeto ya tenía una escala (ej: 0.5), la mantenemos y solo compensamos el estiramiento
+        obj.scale.set(
+          obj.scale.x / width,
+          obj.scale.y / height,
+          obj.scale.z / depth
+        );
+        // IMPORTANTE: Si es un adorno, NO procesamos sus hijos, 
+        // ya que la compensación del padre ya los protege a todos.
+        return;
+      }
 
-    // Recorremos todos los objetos del modelo para aplicar compensaciones
-    clonedScene.traverse((obj) => {
-      if (obj instanceof THREE.Mesh || obj instanceof THREE.Group) {
-        const name = obj.name.toLowerCase();
-        
-        // 1. Detección de ADORNOS (No deben deformarse NUNCA)
-        const isAdorno = 
-          name.includes("vino") || name.includes("botella") || name.includes("bottle") || 
-          name.includes("decor") || name.includes("adorno") || name.includes("glass") || 
-          name.includes("copa") || name.includes("planta") || name.includes("plant") ||
-          name.includes("libro") || name.includes("book") || name.includes("percha") ||
-          name.includes("hanger") || name.includes("zapat") || name.includes("shoe") ||
-          name.includes("objeto") || name.includes("object") || name.includes("maceta");
-
-        if (isAdorno) {
-          // Inversión total de la escala del padre para mantener proporciones reales
-          obj.scale.set(1 / width, 1 / height, 1 / depth);
-          return; // Si es adorno, no aplicamos lógica de estructura
-        }
-
-        // 2. Detección de ESTRUCTURA (Madera y Hierro)
+      // 2. Detección de ESTRUCTURA (Madera y Hierro)
+      if (obj instanceof THREE.Mesh) {
         const isWood = name.includes("madera") || name.includes("wood") || name.includes("estante") || name.includes("shelf") || name.includes("tabla");
-        const isIron = name.includes("hierro") || name.includes("iron") || name.includes("metal") || name.includes("caño") || name.includes("frame") || name.includes("pata");
+        const isIron = name.includes("hierro") || name.includes("iron") || name.includes("metal") || name.includes("caño") || name.includes("frame") || name.includes("pata") || name.includes("perfil");
 
         if (isWood || isIron) {
-          // Lógica Senior de Preservación de Grosores:
-          // Si el objeto es predominantemente horizontal (como un estante):
-          // - Queremos que el ancho (X) cambie con 'width'.
-          // - Queremos que el grosor (Y) y profundidad (Z) se mantengan CONSTANTES.
-          
-          // Nota: En modelos GLB, la orientación depende de cómo se exportó. 
-          // Intentamos compensar basándonos en el nombre y la intención:
-          
           if (isWood) {
             // Un estante de madera: preservamos grosor (Y) y profundidad (Z)
-            // Solo dejamos que el escalado del padre afecte el largo (X)
             obj.scale.set(1, 1 / height, 1 / depth);
           } else if (isIron) {
-            // Un caño estructural:
-            // Si es un parante vertical, queremos que mantenga su sección (X, Z) pero cambie su altura (Y)
+            // Lógica de perfiles metálicos
             if (name.includes("vertical") || name.includes("pata") || name.includes("columna")) {
               obj.scale.set(1 / width, 1, 1 / depth);
-            } 
-            // Si es un travesaño horizontal, queremos que mantenga su sección (Y, Z) pero cambie su largo (X)
-            else if (name.includes("horizontal") || name.includes("travesaño") || name.includes("barra")) {
+            } else if (name.includes("horizontal") || name.includes("travesaño") || name.includes("barra")) {
               obj.scale.set(1, 1 / height, 1 / depth);
-            }
-            // Por defecto para hierro, intentamos que no se "engrose" visualmente de forma exagerada
-            else {
+            } else {
+              // Por defecto para piezas pequeñas de hierro, compensamos parcialmente para que no se vean raras
               obj.scale.set(1 / (width * 0.5 + 0.5), 1 / (height * 0.5 + 0.5), 1 / (depth * 0.5 + 0.5));
             }
           }
         }
       }
-    });
 
-    clonedScene.updateMatrixWorld(true);
-  }, [clonedScene, depth, height, width]);
+      // Procesar hijos recursivamente
+      if (obj.children) {
+        obj.children.forEach(processObject);
+      }
+    };
+
+    // Iniciamos el procesamiento desde los hijos de la escena clonada
+    scene.children.forEach(processObject);
+    scene.updateMatrixWorld(true);
+    
+    return scene;
+  }, [sourceScene, width, height, depth]);
 
   if (!sourceScene || !clonedScene) return null;
 
@@ -115,7 +121,7 @@ export default function EstanteViewer({
   modelPath = null,
 }: Props) {
   return (
-    <div className="h-[500px] w-full overflow-hidden bg-[#f8f8f8] rounded-xl border border-slate-200 shadow-sm relative">
+    <div className="h-[350px] sm:h-[400px] md:h-[500px] w-full max-w-full overflow-hidden bg-[#f8f8f8] rounded-xl border border-slate-200 shadow-sm relative">
       <div className="absolute top-4 left-4 z-10">
         <div className="bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full border border-slate-200 shadow-sm">
           <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2">
@@ -152,7 +158,7 @@ export default function EstanteViewer({
           {/* Fill Light */}
           <directionalLight position={[0, -2, 4]} intensity={0.5} />
 
-          <Center top>
+          <Center>
             <EstanteModel 
               width={width} 
               height={height} 

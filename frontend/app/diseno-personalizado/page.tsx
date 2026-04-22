@@ -167,8 +167,8 @@ export default function DisenoPersonalizadoPage() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl px-4 pb-20 pt-24 sm:px-6 md:pt-28 lg:px-8">
-      <div className="mb-12 flex flex-col items-center text-center">
+    <div className="mx-auto max-w-5xl px-4 pb-20 pt-20 sm:px-6 md:pt-24 lg:px-8">
+      <div className="mb-8 flex flex-col items-center text-center">
         <p className="mb-4 text-xs font-light uppercase tracking-[0.4em] text-accent">
           Experiencia Interactiva
         </p>

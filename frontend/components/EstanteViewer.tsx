@@ -7,12 +7,14 @@ import * as THREE from "three";
 import type { GLTF } from "three-stdlib";
 
 const DEFAULT_MODEL_PATH = "/models/Estanteria.glb";
+const BODEGA_MILAN_SLUG = "estanteria-pared-lineal";
 
 interface Props {
   width?: number;
   height?: number;
   depth?: number;
   modelPath?: string | null;
+  productSlug?: string | null;
 }
 
 function EstanteModel({
@@ -20,6 +22,7 @@ function EstanteModel({
   height = 1,
   depth = 1,
   modelPath,
+  productSlug,
 }: Props) {
   const path = modelPath || DEFAULT_MODEL_PATH;
   const gltf = useGLTF(path) as GLTF;
@@ -34,13 +37,20 @@ function EstanteModel({
     // Aplicamos el escalado base al contenedor principal
     scene.scale.set(width, height, depth);
 
+    // Para la Bodega Milán, calculamos cuántos vinos hay (1 vino = 10cm = 0.1 unidades)
+    const numWines = productSlug === BODEGA_MILAN_SLUG ? Math.round(height / 0.1) : 0;
+    const wineTemplates: THREE.Object3D[] = [];
+    const holderTemplates: THREE.Object3D[] = [];
+
     // Función recursiva para procesar objetos y evitar doble escalado en adornos
     const processObject = (obj: THREE.Object3D) => {
       const name = obj.name.toLowerCase();
       
       // 1. Detección exhaustiva de ADORNOS (No deben deformarse)
+      const isWine = name.includes("vino") || name.includes("wine") || name.includes("botella") || name.includes("bottle");
+      const isHolder = name.includes("soporte") || name.includes("holder") || name.includes("aro") || name.includes("ring");
       const isAdorno = 
-        name.includes("vino") || name.includes("wine") || name.includes("botella") || name.includes("bottle") || 
+        isWine ||
         name.includes("decor") || name.includes("adorno") || name.includes("deco") || name.includes("prop") ||
         name.includes("glass") || name.includes("copa") || name.includes("cup") || 
         name.includes("planta") || name.includes("plant") || name.includes("leaf") ||
@@ -54,6 +64,17 @@ function EstanteModel({
         name.includes("parlante") || name.includes("speaker") || name.includes("acc");
 
       if (isAdorno) {
+        // Si es Bodega Milán, guardamos una plantilla de la primera botella que encontremos y la ocultamos
+        if (productSlug === BODEGA_MILAN_SLUG && isWine) {
+          if (wineTemplates.length === 0) {
+             // Guardamos una copia sin el escalado del padre
+             const template = obj.clone();
+             wineTemplates.push(template);
+          }
+          obj.visible = false;
+          return;
+        }
+
         // Compensamos la escala del padre manteniendo la escala original del objeto
         obj.scale.set(
           obj.scale.x / width,
@@ -65,6 +86,16 @@ function EstanteModel({
 
       // 2. Detección de ESTRUCTURA (Madera y Hierro)
       if (obj instanceof THREE.Mesh) {
+        // Si es Bodega Milán y es un soporte (hierro que se repite), lo guardamos y ocultamos
+        if (productSlug === BODEGA_MILAN_SLUG && isHolder) {
+          if (holderTemplates.length === 0) {
+            const template = obj.clone();
+            holderTemplates.push(template);
+          }
+          obj.visible = false;
+          return;
+        }
+
         const isWood = 
           name.includes("madera") || name.includes("wood") || 
           name.includes("estante") || name.includes("shelf") || 
@@ -77,7 +108,8 @@ function EstanteModel({
           name.includes("metal") || name.includes("steel") ||
           name.includes("caño") || name.includes("pipe") || name.includes("tube") ||
           name.includes("frame") || name.includes("pata") || name.includes("leg") ||
-          name.includes("perfil") || name.includes("structure") || name.includes("support");
+          name.includes("perfil") || name.includes("structure") || name.includes("support") ||
+          isHolder;
 
         if (isWood || isIron) {
           if (isWood) {
@@ -115,10 +147,44 @@ function EstanteModel({
 
     // Iniciamos el procesamiento desde los hijos de la escena clonada
     scene.children.forEach(processObject);
+
+    // Si es Bodega Milán, añadimos las botellas y soportes repetidos
+    if (productSlug === BODEGA_MILAN_SLUG && numWines > 0) {
+      const templateWine = wineTemplates[0];
+      const templateHolder = holderTemplates[0];
+
+      for (let i = 0; i < numWines; i++) {
+        // Posición Y local: cada vino a 0.1 unidades (10cm) de distancia
+        // Pero como el contenedor está escalado por 'height' (ej 0.5), 
+        // 0.1 unidades reales son 0.1 / height unidades locales
+        const localY = (i * 0.1 + 0.05) / height;
+
+        if (templateHolder) {
+          const holder = templateHolder.clone();
+          holder.position.y = localY;
+          // Compensamos la escala del padre en el soporte también si es un mesh individual
+          holder.scale.set(1 / width, 1 / height, 1 / depth);
+          scene.add(holder);
+        }
+
+        if (templateWine) {
+          const wine = templateWine.clone();
+          wine.position.y = localY;
+          // Las botellas ya vienen compensadas del template o se compensan aquí
+          wine.scale.set(
+            templateWine.scale.x / width,
+            templateWine.scale.y / height,
+            templateWine.scale.z / depth
+          );
+          scene.add(wine);
+        }
+      }
+    }
+
     scene.updateMatrixWorld(true);
     
     return scene;
-  }, [sourceScene, width, height, depth]);
+  }, [sourceScene, width, height, depth, productSlug]);
 
   if (!sourceScene || !clonedScene) return null;
 
@@ -138,6 +204,7 @@ export default function EstanteViewer({
   height = 1,
   depth = 1,
   modelPath = null,
+  productSlug = null,
 }: Props) {
   return (
     <div className="h-[350px] sm:h-[400px] md:h-[500px] w-full max-w-full overflow-hidden bg-[#f8f8f8] rounded-xl border border-slate-200 shadow-sm relative">
@@ -151,7 +218,7 @@ export default function EstanteViewer({
       </div>
       <Suspense fallback={<ViewerFallback />}>
         <Canvas 
-          key={modelPath}
+          key={`${modelPath}-${productSlug}`}
           camera={{ position: [3, 2, 3], fov: 45 }}
           shadows
           gl={{ antialias: true, preserveDrawingBuffer: true }}
@@ -183,6 +250,7 @@ export default function EstanteViewer({
               height={height} 
               depth={depth} 
               modelPath={modelPath} 
+              productSlug={productSlug}
             />
           </Center>
 

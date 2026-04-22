@@ -21,6 +21,10 @@ const EstanteViewer = dynamic(() => import("@/components/EstanteViewer"), {
 const phone = "+5491167894523";
 const message = "Hola! Me interesa solicitar un diseño personalizado.";
 
+// Slugs de productos con comportamiento especial
+const BODEGA_MILAN_SLUG = "estanteria-pared-lineal";
+const BANQUETA_CALI_SLUG = "estanteria-acero-geometrico";
+
 function SliderControl({
   label,
   value,
@@ -141,15 +145,23 @@ export default function DisenoPersonalizadoPage() {
         if (current) {
           setProduct(current);
           if (!searchParams.get("width")) setWidth(current.width || 100);
-          if (!searchParams.get("height")) setHeight(current.height || 100);
+          
+          if (!searchParams.get("height")) {
+            const h = current.height || 100;
+            setHeight(current.slug === BODEGA_MILAN_SLUG ? h / 10 : h);
+          } else {
+            const h = Number(searchParams.get("height"));
+            setHeight(current.slug === BODEGA_MILAN_SLUG ? h / 10 : h);
+          }
+
           if (!searchParams.get("depth")) setDepth(current.depth || 30);
         }
       } else if (productsWithModel.length > 0) {
-        // Si no hay slug, cargamos el primero por defecto
         const first = productsWithModel[0];
         setProduct(first);
         setWidth(first.width || 100);
-        setHeight(first.height || 100);
+        const h = first.height || 100;
+        setHeight(first.slug === BODEGA_MILAN_SLUG ? h / 10 : h);
         setDepth(first.depth || 30);
       }
     });
@@ -158,9 +170,10 @@ export default function DisenoPersonalizadoPage() {
   const handleProductChange = (newProduct: Product) => {
     setProduct(newProduct);
     setWidth(newProduct.width || 100);
-    setHeight(newProduct.height || 100);
+    const h = newProduct.height || 100;
+    setHeight(newProduct.slug === BODEGA_MILAN_SLUG ? h / 10 : h);
     setDepth(newProduct.depth || 30);
-    // Actualizar la URL sin recargar para que el usuario pueda compartir el link
+    
     const newUrl = new URL(window.location.href);
     newUrl.searchParams.set("product", newProduct.slug);
     window.history.pushState({}, "", newUrl.toString());
@@ -183,9 +196,10 @@ export default function DisenoPersonalizadoPage() {
           <div className="relative group w-full">
             <EstanteViewer 
               width={width / 100} 
-              height={height / 100} 
+              height={product?.slug === BODEGA_MILAN_SLUG ? (height * 10) / 100 : height / 100} 
               depth={depth / 100} 
               modelPath={product?.modelPath}
+              productSlug={product?.slug}
             />
             {product?.image && (
               <div className="absolute top-4 right-4 w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 border-2 border-white shadow-xl overflow-hidden z-10 transition-transform hover:scale-105">
@@ -254,60 +268,69 @@ export default function DisenoPersonalizadoPage() {
             </div>
 
             <div className="space-y-6">
+              {/* Solo mostrar Ancho y Profundidad si no es Bodega o Banqueta */}
+              {product?.slug !== BODEGA_MILAN_SLUG && product?.slug !== BANQUETA_CALI_SLUG && (
+                <div className="grid grid-cols-[1fr_100px] gap-4">
+                  <SliderControl
+                    label="Ancho"
+                    value={width}
+                    min={10}
+                    max={250}
+                    step={1}
+                    onChange={setWidth}
+                  />
+                  <NumberInput
+                    label=""
+                    value={width}
+                    min={10}
+                    max={250}
+                    step={1}
+                    onChange={setWidth}
+                  />
+                </div>
+              )}
+
               <div className="grid grid-cols-[1fr_100px] gap-4">
                 <SliderControl
-                  label="Ancho"
-                  value={width}
-                  min={10}
-                  max={250}
-                  step={1}
-                  onChange={setWidth}
-                />
-                <NumberInput
-                  label=""
-                  value={width}
-                  min={10}
-                  max={250}
-                  step={1}
-                  onChange={setWidth}
-                />
-              </div>
-              <div className="grid grid-cols-[1fr_100px] gap-4">
-                <SliderControl
-                  label="Alto"
+                  label={product?.slug === BODEGA_MILAN_SLUG ? "Cantidad de Vinos" : "Alto"}
                   value={height}
-                  min={10}
-                  max={250}
+                  min={product?.slug === BODEGA_MILAN_SLUG ? 1 : 10}
+                  max={product?.slug === BODEGA_MILAN_SLUG ? 20 : 250}
                   step={1}
                   onChange={setHeight}
+                  unit={product?.slug === BODEGA_MILAN_SLUG ? "vinos" : "cm"}
                 />
                 <NumberInput
                   label=""
                   value={height}
-                  min={10}
-                  max={250}
+                  min={product?.slug === BODEGA_MILAN_SLUG ? 1 : 10}
+                  max={product?.slug === BODEGA_MILAN_SLUG ? 20 : 250}
                   step={1}
                   onChange={setHeight}
+                  unit={product?.slug === BODEGA_MILAN_SLUG ? "vinos" : "cm"}
                 />
               </div>
-              <div className="grid grid-cols-[1fr_100px] gap-4">
-                <SliderControl
-                  label="Profundidad"
-                  value={depth}
-                  min={10}
-                  max={100}
-                  step={1}
-                  onChange={setDepth}
-                />
-                <NumberInput
-                  label=""
-                  value={depth}
-                  min={10}
-                  max={100}
-                  step={1}
-                  onChange={setDepth}
-                />
-              </div>
+
+              {product?.slug !== BODEGA_MILAN_SLUG && product?.slug !== BANQUETA_CALI_SLUG && (
+                <div className="grid grid-cols-[1fr_100px] gap-4">
+                  <SliderControl
+                    label="Profundidad"
+                    value={depth}
+                    min={10}
+                    max={100}
+                    step={1}
+                    onChange={setDepth}
+                  />
+                  <NumberInput
+                    label=""
+                    value={depth}
+                    min={10}
+                    max={100}
+                    step={1}
+                    onChange={setDepth}
+                  />
+                </div>
+              )}
             </div>
           </div>
           <div className="flex-1 bg-white" />

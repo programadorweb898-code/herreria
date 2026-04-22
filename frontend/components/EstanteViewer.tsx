@@ -40,9 +40,10 @@ function EstanteModel({
       
       // 1. Detección exhaustiva de ADORNOS (No deben deformarse)
       const isAdorno = 
-        name.includes("vino") || name.includes("botella") || name.includes("bottle") || 
-        name.includes("decor") || name.includes("adorno") || name.includes("glass") || 
-        name.includes("copa") || name.includes("planta") || name.includes("plant") ||
+        name.includes("vino") || name.includes("wine") || name.includes("botella") || name.includes("bottle") || 
+        name.includes("decor") || name.includes("adorno") || name.includes("deco") || name.includes("prop") ||
+        name.includes("glass") || name.includes("copa") || name.includes("cup") || 
+        name.includes("planta") || name.includes("plant") || name.includes("leaf") ||
         name.includes("libro") || name.includes("book") || name.includes("percha") ||
         name.includes("hanger") || name.includes("zapat") || name.includes("shoe") ||
         name.includes("objeto") || name.includes("object") || name.includes("maceta") ||
@@ -50,25 +51,33 @@ function EstanteModel({
         name.includes("vela") || name.includes("candle") || name.includes("vaso") ||
         name.includes("pot") || name.includes("comida") || name.includes("food") ||
         name.includes("canasto") || name.includes("basket") || name.includes("tv") ||
-        name.includes("parlante") || name.includes("speaker");
+        name.includes("parlante") || name.includes("speaker") || name.includes("acc");
 
       if (isAdorno) {
         // Compensamos la escala del padre manteniendo la escala original del objeto
-        // Si el objeto ya tenía una escala (ej: 0.5), la mantenemos y solo compensamos el estiramiento
         obj.scale.set(
           obj.scale.x / width,
           obj.scale.y / height,
           obj.scale.z / depth
         );
-        // IMPORTANTE: Si es un adorno, NO procesamos sus hijos, 
-        // ya que la compensación del padre ya los protege a todos.
         return;
       }
 
       // 2. Detección de ESTRUCTURA (Madera y Hierro)
       if (obj instanceof THREE.Mesh) {
-        const isWood = name.includes("madera") || name.includes("wood") || name.includes("estante") || name.includes("shelf") || name.includes("tabla");
-        const isIron = name.includes("hierro") || name.includes("iron") || name.includes("metal") || name.includes("caño") || name.includes("frame") || name.includes("pata") || name.includes("perfil");
+        const isWood = 
+          name.includes("madera") || name.includes("wood") || 
+          name.includes("estante") || name.includes("shelf") || 
+          name.includes("tabla") || name.includes("plank") || 
+          name.includes("board") || name.includes("panel") ||
+          name.includes("top") || name.includes("timber");
+
+        const isIron = 
+          name.includes("hierro") || name.includes("iron") || 
+          name.includes("metal") || name.includes("steel") ||
+          name.includes("caño") || name.includes("pipe") || name.includes("tube") ||
+          name.includes("frame") || name.includes("pata") || name.includes("leg") ||
+          name.includes("perfil") || name.includes("structure") || name.includes("support");
 
         if (isWood || isIron) {
           if (isWood) {
@@ -76,12 +85,22 @@ function EstanteModel({
             obj.scale.set(1, 1 / height, 1 / depth);
           } else if (isIron) {
             // Lógica de perfiles metálicos
-            if (name.includes("vertical") || name.includes("pata") || name.includes("columna")) {
+            const isVertical = 
+              name.includes("vertical") || name.includes("pata") || name.includes("leg") ||
+              name.includes("columna") || name.includes("column") || name.includes("post") ||
+              name.includes("upright");
+            
+            const isHorizontal = 
+              name.includes("horizontal") || name.includes("travesaño") || name.includes("barra") ||
+              name.includes("bar") || name.includes("beam") || name.includes("rail") ||
+              name.includes("support") || name.includes("cross");
+
+            if (isVertical) {
               obj.scale.set(1 / width, 1, 1 / depth);
-            } else if (name.includes("horizontal") || name.includes("travesaño") || name.includes("barra")) {
+            } else if (isHorizontal) {
               obj.scale.set(1, 1 / height, 1 / depth);
             } else {
-              // Por defecto para piezas pequeñas de hierro, compensamos parcialmente para que no se vean raras
+              // Por defecto para piezas pequeñas de hierro, compensamos parcialmente
               obj.scale.set(1 / (width * 0.5 + 0.5), 1 / (height * 0.5 + 0.5), 1 / (depth * 0.5 + 0.5));
             }
           }

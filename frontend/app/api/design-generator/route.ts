@@ -126,7 +126,7 @@ function parseDesignResponse(content: string): DesignResponse {
           ? parsed.description
           : "DiseÃ±o personalizado",
       width: Math.max(30, Math.min(300, parseInt(String(parsed.width), 10) || 150)),
-      height: Math.max(30, Math.min(300, parseInt(String(parsed.height), 10) || 100)),
+      height: Math.max(30, Math.min(300, parseInt(String(parsed.height), 10) || 75)),
       depth: Math.max(20, Math.min(100, parseInt(String(parsed.depth), 10) || 30)),
       complexity: Math.max(1, Math.min(4, parseInt(String(parsed.complexity), 10) || 2)),
       material: typeof parsed.material === "string" ? parsed.material : "acero",

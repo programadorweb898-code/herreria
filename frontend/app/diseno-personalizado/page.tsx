@@ -118,18 +118,32 @@ export default function DisenoPersonalizadoPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
 
-  const initialWidth = useMemo(
-    () => Number(searchParams.get("width")) || 100,
-    [searchParams]
-  );
-  const initialHeight = useMemo(
-    () => Number(searchParams.get("height")) || 100,
-    [searchParams]
-  );
-  const initialDepth = useMemo(
-    () => Number(searchParams.get("depth")) || 30,
-    [searchParams]
-  );
+  const initialWidth = useMemo(() => {
+    const w = searchParams.get("width");
+    if (w) return Number(w);
+    if (productSlug === BANQUETA_CALI_SLUG) return 30;
+    if (productSlug === BODEGA_MILAN_SLUG) return 60;
+    return 100;
+  }, [searchParams, productSlug]);
+
+  const initialHeight = useMemo(() => {
+    const h = searchParams.get("height");
+    if (h) {
+      const val = Number(h);
+      return productSlug === BODEGA_MILAN_SLUG ? val / 10 : val;
+    }
+    if (productSlug === BANQUETA_CALI_SLUG) return 75;
+    if (productSlug === BODEGA_MILAN_SLUG) return 5; // 5 vinos por defecto (50cm / 10)
+    return 100;
+  }, [searchParams, productSlug]);
+
+  const initialDepth = useMemo(() => {
+    const d = searchParams.get("depth");
+    if (d) return Number(d);
+    if (productSlug === BANQUETA_CALI_SLUG) return 30;
+    if (productSlug === BODEGA_MILAN_SLUG) return 15;
+    return 30;
+  }, [searchParams, productSlug]);
 
   const [width, setWidth] = useState(initialWidth);
   const [height, setHeight] = useState(initialHeight);

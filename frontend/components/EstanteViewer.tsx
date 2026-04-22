@@ -162,19 +162,24 @@ function EstanteModel({
         if (templateHolder) {
           const holder = templateHolder.clone();
           holder.position.y = localY;
-          // Compensamos la escala del padre en el soporte también si es un mesh individual
-          holder.scale.set(1 / width, 1 / height, 1 / depth);
+          // Para la bodega, el soporte escala con el ancho/profundidad del mueble
+          // pero compensamos el alto porque la altura total crece según la cantidad de vinos
+          holder.scale.set(
+            templateHolder.scale.x,
+            templateHolder.scale.y / height,
+            templateHolder.scale.z
+          );
           scene.add(holder);
         }
 
         if (templateWine) {
           const wine = templateWine.clone();
           wine.position.y = localY;
-          // Las botellas ya vienen compensadas del template o se compensan aquí
+          // Las botellas deben mantener su proporción relativa al ancho del mueble
           wine.scale.set(
-            templateWine.scale.x / width,
+            templateWine.scale.x,
             templateWine.scale.y / height,
-            templateWine.scale.z / depth
+            templateWine.scale.z
           );
           scene.add(wine);
         }

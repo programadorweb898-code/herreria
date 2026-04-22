@@ -6,7 +6,7 @@ import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { getProduct, getProducts } from "@/data/products";
+import { getProducts } from "@/data/products";
 import type { Product } from "@/types/product";
 
 const EstanteViewer = dynamic(() => import("@/components/EstanteViewer"), {

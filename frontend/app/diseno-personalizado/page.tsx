@@ -6,7 +6,7 @@ import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { getProduct } from "@/data/products";
+import { getProduct, getProducts } from "@/data/products";
 import type { Product } from "@/types/product";
 
 const EstanteViewer = dynamic(() => import("@/components/EstanteViewer"), {
@@ -112,6 +112,7 @@ export default function DisenoPersonalizadoPage() {
   const searchParams = useSearchParams();
   const productSlug = searchParams.get("product");
   const [product, setProduct] = useState<Product | null>(null);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
 
   const initialWidth = useMemo(
     () => Number(searchParams.get("width")) || 100,
@@ -131,18 +132,39 @@ export default function DisenoPersonalizadoPage() {
   const [depth, setDepth] = useState(initialDepth);
 
   useEffect(() => {
-    if (productSlug) {
-      void getProduct(productSlug).then((p) => {
-        if (p) {
-          setProduct(p);
-          // Solo actualizamos si no vienen por URL para no pisar el link del producto
-          if (!searchParams.get("width")) setWidth(p.width || 100);
-          if (!searchParams.get("height")) setHeight(p.height || 100);
-          if (!searchParams.get("depth")) setDepth(p.depth || 30);
+    void getProducts().then((products) => {
+      const productsWithModel = products.filter(p => p.modelPath);
+      setAllProducts(productsWithModel);
+      
+      if (productSlug) {
+        const current = productsWithModel.find(p => p.slug === productSlug);
+        if (current) {
+          setProduct(current);
+          if (!searchParams.get("width")) setWidth(current.width || 100);
+          if (!searchParams.get("height")) setHeight(current.height || 100);
+          if (!searchParams.get("depth")) setDepth(current.depth || 30);
         }
-      });
-    }
+      } else if (productsWithModel.length > 0) {
+        // Si no hay slug, cargamos el primero por defecto
+        const first = productsWithModel[0];
+        setProduct(first);
+        setWidth(first.width || 100);
+        setHeight(first.height || 100);
+        setDepth(first.depth || 30);
+      }
+    });
   }, [productSlug, searchParams]);
+
+  const handleProductChange = (newProduct: Product) => {
+    setProduct(newProduct);
+    setWidth(newProduct.width || 100);
+    setHeight(newProduct.height || 100);
+    setDepth(newProduct.depth || 30);
+    // Actualizar la URL sin recargar para que el usuario pueda compartir el link
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.set("product", newProduct.slug);
+    window.history.pushState({}, "", newUrl.toString());
+  };
 
   return (
     <div className="mx-auto max-w-5xl px-6 pb-20 pt-32 sm:px-8 sm:pb-24 lg:px-12">
@@ -169,6 +191,35 @@ export default function DisenoPersonalizadoPage() {
               </div>
             )}
           </div>
+
+          {/* Selector de productos */}
+          <div className="space-y-4 border-t border-slate-100 pt-6">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-accent">Cambiar producto 3D</p>
+            <div className="flex gap-3 overflow-x-auto pb-4 custom-scrollbar">
+              {allProducts.map((p) => (
+                <button
+                  key={p._id}
+                  onClick={() => handleProductChange(p)}
+                  className={`relative flex-shrink-0 w-20 h-20 border-2 transition-all duration-300 ${
+                    product?.slug === p.slug 
+                      ? "border-foreground scale-105 shadow-lg z-10" 
+                      : "border-transparent opacity-50 hover:opacity-100 hover:scale-105"
+                  }`}
+                >
+                  <Image 
+                    src={p.image || ""} 
+                    alt={p.name} 
+                    fill 
+                    className="object-cover"
+                  />
+                  {product?.slug !== p.slug && (
+                    <div className="absolute inset-0 bg-white/10" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {product && (
             <div className="bg-slate-50 p-4 border-l-4 border-foreground">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-accent mb-1">Modelo Seleccionado</p>

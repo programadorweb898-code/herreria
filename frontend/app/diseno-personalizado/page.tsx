@@ -167,7 +167,17 @@ export default function DisenoPersonalizadoPage() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl px-4 pb-20 pt-28 sm:px-6 md:pt-32 lg:px-8">
+    <div className="mx-auto max-w-5xl px-4 pb-20 pt-24 sm:px-6 md:pt-28 lg:px-8">
+      <div className="mb-12 flex flex-col items-center text-center">
+        <p className="mb-4 text-xs font-light uppercase tracking-[0.4em] text-accent">
+          Experiencia Interactiva
+        </p>
+        <h1 className="text-4xl font-semibold uppercase tracking-tight sm:text-5xl md:text-6xl">
+          Diseño Personalizado
+        </h1>
+        <div className="mt-6 h-px w-24 bg-foreground/20" />
+      </div>
+
       <section className="mb-10 grid gap-px border border-border bg-border md:grid-cols-[1.2fr_0.8fr] lg:grid-cols-[1.4fr_1fr] overflow-hidden">
         <div className="bg-white p-4 sm:p-6 md:p-8 flex flex-col gap-6 overflow-hidden">
           <div className="relative group w-full">
@@ -228,76 +238,79 @@ export default function DisenoPersonalizadoPage() {
           )}
         </div>
 
-        <div className="flex flex-col justify-center gap-8 bg-white px-6 py-8 sm:px-8 sm:py-10">
-          <div className="space-y-3">
-            <p className="text-xs font-light uppercase tracking-[0.28em] text-accent">
-              Visor interactivo
-            </p>
-            <h2 className="text-3xl font-semibold uppercase tracking-tight">
-              Ajustá el estante en tiempo real.
-            </h2>
-            <p className="text-sm font-light leading-7 text-slate-600">
-              Explorá proporciones antes de pedir tu pieza y usá estos valores como referencia para
-              tu diseño personalizado.
-            </p>
-          </div>
+        <div className="bg-white p-4 sm:p-6 md:p-8 flex flex-col">
+          <div className="h-[350px] sm:h-[400px] md:h-[500px] overflow-y-auto custom-scrollbar pr-2 flex flex-col gap-8">
+            <div className="space-y-3">
+              <p className="text-xs font-light uppercase tracking-[0.28em] text-accent">
+                Visor interactivo
+              </p>
+              <h2 className="text-2xl md:text-3xl font-semibold uppercase tracking-tight">
+                Ajustá el estante en tiempo real.
+              </h2>
+              <p className="text-sm font-light leading-7 text-slate-600">
+                Explorá proporciones antes de pedir tu pieza y usá estos valores como referencia para
+                tu diseño personalizado.
+              </p>
+            </div>
 
-          <div className="space-y-6">
-            <div className="grid grid-cols-[1fr_100px] gap-4">
-              <SliderControl
-                label="Ancho"
-                value={width}
-                min={10}
-                max={250}
-                step={1}
-                onChange={setWidth}
-              />
-              <NumberInput
-                label=""
-                value={width}
-                min={10}
-                max={250}
-                step={1}
-                onChange={setWidth}
-              />
-            </div>
-            <div className="grid grid-cols-[1fr_100px] gap-4">
-              <SliderControl
-                label="Alto"
-                value={height}
-                min={10}
-                max={250}
-                step={1}
-                onChange={setHeight}
-              />
-              <NumberInput
-                label=""
-                value={height}
-                min={10}
-                max={250}
-                step={1}
-                onChange={setHeight}
-              />
-            </div>
-            <div className="grid grid-cols-[1fr_100px] gap-4">
-              <SliderControl
-                label="Profundidad"
-                value={depth}
-                min={10}
-                max={100}
-                step={1}
-                onChange={setDepth}
-              />
-              <NumberInput
-                label=""
-                value={depth}
-                min={10}
-                max={100}
-                step={1}
-                onChange={setDepth}
-              />
+            <div className="space-y-6">
+              <div className="grid grid-cols-[1fr_100px] gap-4">
+                <SliderControl
+                  label="Ancho"
+                  value={width}
+                  min={10}
+                  max={250}
+                  step={1}
+                  onChange={setWidth}
+                />
+                <NumberInput
+                  label=""
+                  value={width}
+                  min={10}
+                  max={250}
+                  step={1}
+                  onChange={setWidth}
+                />
+              </div>
+              <div className="grid grid-cols-[1fr_100px] gap-4">
+                <SliderControl
+                  label="Alto"
+                  value={height}
+                  min={10}
+                  max={250}
+                  step={1}
+                  onChange={setHeight}
+                />
+                <NumberInput
+                  label=""
+                  value={height}
+                  min={10}
+                  max={250}
+                  step={1}
+                  onChange={setHeight}
+                />
+              </div>
+              <div className="grid grid-cols-[1fr_100px] gap-4">
+                <SliderControl
+                  label="Profundidad"
+                  value={depth}
+                  min={10}
+                  max={100}
+                  step={1}
+                  onChange={setDepth}
+                />
+                <NumberInput
+                  label=""
+                  value={depth}
+                  min={10}
+                  max={100}
+                  step={1}
+                  onChange={setDepth}
+                />
+              </div>
             </div>
           </div>
+          <div className="flex-1 bg-white" />
         </div>
       </section>
 

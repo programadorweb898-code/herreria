@@ -1,13 +1,11 @@
 "use client";
 
-import React, { useState, useRef, useMemo, Suspense } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import React, { useState, useRef, Suspense } from "react";
+import { Canvas } from "@react-three/fiber";
 import { 
   OrbitControls, 
   Environment, 
   ContactShadows, 
-  PerspectiveCamera,
-  useGLTF,
   Float,
   Box,
   Cylinder

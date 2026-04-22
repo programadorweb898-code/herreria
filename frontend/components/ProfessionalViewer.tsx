@@ -1,20 +1,16 @@
 "use client";
 
-import React, { Suspense, useState, useEffect, useRef } from "react";
-import { Canvas } from "@react-three/fiber";
+import React, { Suspense, useState, useEffect } from "react";
+import { Canvas, ThreeEvent } from "@react-three/fiber";
 import { 
   OrbitControls, 
   Stage, 
   Bounds, 
   useGLTF, 
-  Environment, 
-  ContactShadows,
-  PerspectiveCamera,
   Html,
   useCursor
 } from "@react-three/drei";
 import * as THREE from "three";
-import gsap from "gsap";
 
 // --- Tipos ---
 interface MeshNode {
@@ -52,18 +48,18 @@ const Model = ({ url, setMeshList, onMeshClick }: {
     setMeshList(meshes);
   }, [scene, setMeshList]);
 
-  const handleClick = (e: any) => {
+  const handleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
-    if (onMeshClick) onMeshClick(e.object.name);
+    if (onMeshClick) onMeshClick((e.object as THREE.Mesh).name);
   };
 
   return (
     <primitive 
       object={scene} 
       onClick={handleClick}
-      onPointerOver={(e: any) => {
+      onPointerOver={(e: ThreeEvent<MouseEvent>) => {
         e.stopPropagation();
-        setHovered(e.object.name);
+        setHovered((e.object as THREE.Mesh).name);
       }}
       onPointerOut={() => setHovered(null)}
     />

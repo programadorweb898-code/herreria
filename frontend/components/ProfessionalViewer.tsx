@@ -110,16 +110,7 @@ const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig
       const size = new THREE.Vector3();
       box.getSize(size);
 
-      // Evitamos división por cero
-      const scaleX = width / (size.x || 1);
-      const scaleY = height / (size.y || 1);
-      const scaleZ = depth / (size.z || 1);
-
       // Aplicamos el escalado al objeto raíz de la escena
-      // scene.scale.set(scaleX, scaleY, scaleZ); 
-      // Sin embargo, setFromObject con scale puede ser tricky. 
-      // Es mejor usar una escala base y ajustarla.
-      
       // Ajuste simplificado: si queremos que mida 'width' de ancho, etc.
       // Usamos el tamaño actual sin escala para determinar el factor.
       scene.scale.set(1, 1, 1);

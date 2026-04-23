@@ -4,6 +4,7 @@ const links = [
   { href: "/productos", label: "Nuestros trabajos" },
   { href: "/nosotros", label: "Quiénes somos" },
   { href: "/diseno-personalizado", label: "Diseño personalizado" },
+  { href: "/showroom", label: "Showroom" },
 ];
 
 const socialLinks = [

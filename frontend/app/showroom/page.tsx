@@ -221,7 +221,7 @@ export default function ShowroomPage() {
           <p className="text-neutral-400 leading-8 mb-10 max-w-2xl mx-auto">
             Trabajamos con vos para diseñar y fabricar muebles y objetos metálicos que se adapten perfectamente a tus necesidades y espacios.
           </p>
-          <a href={`https://wa.me/5491167894523?text=Hola! Me interesa solicitar un diseño personalizado basado en el showroom.`} className="inline-block bg-emerald-500 hover:bg-emerald-600 text-black font-bold px-8 py-4 rounded-lg transition-colors">
+          <a href={`https://wa.me/5491167894523?text=Hola%21%20Me%20interesa%20solicitar%20un%20dise%C3%B1o%20personalizado%20basado%20en%20el%20showroom.`} className="inline-block bg-emerald-500 hover:bg-emerald-600 text-black font-bold px-8 py-4 rounded-lg transition-colors">
             Solicitar diseño
           </a>
         </div>

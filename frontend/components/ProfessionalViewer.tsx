@@ -98,7 +98,7 @@ export default function ProfessionalViewer({ modelUrl, onMeshClick }: Profession
             shadows={{ type: 'contact', opacity: 0.4, blur: 2 }} 
             adjustCamera={false}
           >
-            <Bounds fit clip observe>
+            <Bounds fit clip>
               <Model 
                 url={modelUrl} 
                 setMeshList={setMeshList}

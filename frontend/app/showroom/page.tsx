@@ -246,12 +246,3 @@ export default function ShowroomPage() {
     </main>
   );
 }
-te/5">
-          <p className="mb-2 text-xs font-light uppercase tracking-[0.22em] text-emerald-400">Tiempos</p>
-          <p className="text-sm text-neutral-400 leading-7">Cotización según proyecto. Fabricación y entrega con cronograma acordado.</p>
-        </div>
-      </section>
-
-    </main>
-  );
-}

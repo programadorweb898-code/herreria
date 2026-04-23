@@ -41,34 +41,34 @@ const DynamicOrbitControls = ({
   controlsRef, 
   onCameraChange, 
   setShouldAdjust,
-  objWidth
+  objWidth,
+  objHeight
 }: { 
   controlsRef: React.RefObject<OrbitControlsImpl>, 
   onCameraChange: () => void, 
   setShouldAdjust: (val: boolean) => void,
-  objWidth: number
+  objWidth: number,
+  objHeight: number
 }) => {
   const { size, camera } = useThree();
   
-  // Calculamos la distancia necesaria para que el objeto ocupe X porcentaje del ancho
-  // Basado en: visibleWidth = 2 * Math.tan(fov/2) * distance * aspect
+  // Calculamos la distancia necesaria para que el objeto ocupe X porcentaje
   const getDistanceForPercent = (percent: number) => {
     const perspectiveCamera = camera as THREE.PerspectiveCamera;
     const fovRad = (perspectiveCamera.fov * Math.PI) / 180;
     const aspect = size.width / size.height;
     
-    // Queremos que objWidth / visibleWidth = percent
-    // visibleWidth = objWidth / percent
-    const targetVisibleWidth = objWidth / percent;
+    // Distancia para ancho y alto
+    const distW = (objWidth / percent) / (2 * Math.tan(fovRad / 2) * aspect);
+    const distH = (objHeight / percent) / (2 * Math.tan(fovRad / 2));
     
-    // distance = targetVisibleWidth / (2 * Math.tan(fovRad/2) * aspect)
-    return targetVisibleWidth / (2 * Math.tan(fovRad / 2) * aspect);
+    return Math.max(distW, distH);
   };
 
-  // Límite de acercamiento (zoom in): objeto al 70% del ancho
-  const minDistance = getDistanceForPercent(0.7);
-  // Límite de alejamiento (zoom out): objeto al 25% del ancho (para que no se pierda)
-  const maxDistance = getDistanceForPercent(0.25);
+  // minDistance: objeto al 120% (permite ver de cerca)
+  const minDistance = getDistanceForPercent(1.2);
+  // maxDistance: objeto al 15% (permite alejarse más)
+  const maxDistance = getDistanceForPercent(0.15);
 
   return (
     <OrbitControls 
@@ -79,8 +79,7 @@ const DynamicOrbitControls = ({
       maxDistance={maxDistance}
       minPolarAngle={0} 
       maxPolarAngle={Math.PI} 
-      enableDamping
-      dampingFactor={0.1}
+      enableDamping={false}
       onStart={() => setShouldAdjust(false)}
       onEnd={onCameraChange}
     />
@@ -263,7 +262,7 @@ export default function ProfessionalViewer({ modelUrl, onMeshClick, width, heigh
           <Stage 
             intensity={0.5} 
             environment="city" 
-            shadows={{ type: 'contact', opacity: 0.4, blur: 2 }} 
+            shadows={false} 
             adjustCamera={shouldAdjust}
           >
             <group scale={0.85}>
@@ -285,6 +284,7 @@ export default function ProfessionalViewer({ modelUrl, onMeshClick, width, heigh
             onCameraChange={handleCameraChange}
             setShouldAdjust={setShouldAdjust}
             objWidth={Math.max(width || 100, depth || 100)}
+            objHeight={height || 180}
           />
         </Suspense>
       </Canvas>

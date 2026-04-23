@@ -57,8 +57,7 @@ export default function ShowroomPage() {
   <div className="space-y-4">
     {/* Visor 3D: altura reducida en móviles para dejar espacio */}
     <div className="bg-neutral-900 rounded-2xl p-2 border border-white/5 h-[300px] sm:h-[400px]">
-      <ProfessionalViewer modelUrl={selectedProduct.modelPath} />
-    </div>
+      <ProfessionalViewer modelUrl={selectedProduct.modelPath || ""} />    </div>
 
     {/* Miniaturas compactas */}
     <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">

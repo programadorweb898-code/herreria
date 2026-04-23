@@ -275,6 +275,8 @@ const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig
 export default function ProfessionalViewer({ modelUrl, onMeshClick, width, height, depth, woodConfig, onReset, cameraState, onCameraChange }: ProfessionalViewerProps) {
   const [shouldAdjust, setShouldAdjust] = useState(true);
   const controlsRef = useRef<OrbitControlsImpl>(null);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [_meshList, setMeshList] = useState<MeshNode[]>([]);
 
   const hasCameraState = !!cameraState;
   

@@ -67,6 +67,7 @@ export default function ShowroomPage() {
           };
         });
         setProductConfigs(initialConfigs);
+        setViewerKey(Date.now()); // Set initial key
       }
     }
     loadProducts();
@@ -114,7 +115,7 @@ export default function ShowroomPage() {
     {/* Visor 3D */}
     <div className="relative bg-neutral-900 rounded-2xl p-2 border border-white/5 h-[400px] sm:h-[600px] overflow-hidden">
       <ProfessionalViewer 
-        key={selectedProduct._id}
+        key={viewerKey}
         modelUrl={selectedProduct.modelPath || ""} 
         width={currentConfig.width}
         height={currentConfig.height}
@@ -237,6 +238,15 @@ export default function ShowroomPage() {
           <p className="text-sm text-neutral-400 leading-7">Hierro, acero, madera y acabados a tu elección. Calidad y precisión garantizadas.</p>
         </div>
         <div className="bg-neutral-900 p-8 rounded-2xl border border-white/5">
+          <p className="mb-2 text-xs font-light uppercase tracking-[0.22em] text-emerald-400">Tiempos</p>
+          <p className="text-sm text-neutral-400 leading-7">Cotización según proyecto. Fabricación y entrega con cronograma acordado.</p>
+        </div>
+      </section>
+
+    </main>
+  );
+}
+te/5">
           <p className="mb-2 text-xs font-light uppercase tracking-[0.22em] text-emerald-400">Tiempos</p>
           <p className="text-sm text-neutral-400 leading-7">Cotización según proyecto. Fabricación y entrega con cronograma acordado.</p>
         </div>

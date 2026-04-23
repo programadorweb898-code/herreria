@@ -32,27 +32,68 @@ export default function ShowroomPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   
-  const [width, setWidth] = useState(100);
-  const [height, setHeight] = useState(180);
-  const [depth, setDepth] = useState(30);
-  const [selectedWood, setSelectedWood] = useState(WOOD_TYPES[0]);
+  const [productConfigs, setProductConfigs] = useState<Record<string, {
+    width: number;
+    height: number;
+    depth: number;
+    wood: typeof WOOD_TYPES[0];
+  }>>({});
 
+  // 1. Cargar productos e inicializar configuraciones
   useEffect(() => {
     async function loadProducts() {
-// ... (loadProducts logic)
       const data = await getProducts();
       setProducts(data);
       if (data.length > 0) {
         setSelectedProduct(data[0]);
-        setWidth(data[0].width || 100);
-        setHeight(data[0].height || 180);
-        setDepth(data[0].depth || 30);
+        
+        // Intentar cargar desde LocalStorage
+        const saved = localStorage.getItem('showroom_configs');
+        const savedConfigs = saved ? JSON.parse(saved) : {};
+
+        const initialConfigs: typeof productConfigs = {};
+        data.forEach(p => {
+          // Prioridad: 1. Lo guardado en LocalStorage, 2. Los defaults del producto
+          initialConfigs[p._id] = savedConfigs[p._id] || {
+            width: p.width || 100,
+            height: p.height || 180,
+            depth: p.depth || 30,
+            wood: WOOD_TYPES[0]
+          };
+        });
+        setProductConfigs(initialConfigs);
       }
     }
     loadProducts();
   }, []);
 
-  if (!selectedProduct) return null;
+  // 2. Guardar en LocalStorage cada vez que cambien las configuraciones
+  useEffect(() => {
+    if (Object.keys(productConfigs).length > 0) {
+      localStorage.setItem('showroom_configs', JSON.stringify(productConfigs));
+    }
+  }, [productConfigs]);
+
+  if (!selectedProduct || !productConfigs[selectedProduct._id]) return null;
+
+  // Helpers para obtener y setear valores del producto actual
+  const currentConfig = productConfigs[selectedProduct._id];
+
+  const updateConfig = (updates: Partial<typeof currentConfig>) => {
+    setProductConfigs(prev => ({
+      ...prev,
+      [selectedProduct._id]: { ...prev[selectedProduct._id], ...updates }
+    }));
+  };
+
+  const handleReset = () => {
+    updateConfig({
+      width: selectedProduct.width || 100,
+      height: selectedProduct.height || 180,
+      depth: selectedProduct.depth || 30,
+      wood: WOOD_TYPES[0]
+    });
+  };
 
   return (
     <main className="min-h-screen bg-neutral-950 text-white">
@@ -65,28 +106,24 @@ export default function ShowroomPage() {
         </header>
 <section className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6">
   <div className="space-y-4 overflow-hidden">
-    {/* Visor 3D: altura optimizada */}
+    {/* Visor 3D */}
     <div className="relative bg-neutral-900 rounded-2xl p-2 border border-white/5 h-[400px] sm:h-[600px] overflow-hidden">
       <ProfessionalViewer 
         modelUrl={selectedProduct.modelPath || ""} 
-        width={width}
-        height={height}
-        depth={depth}
-        woodConfig={selectedWood}
+        width={currentConfig.width}
+        height={currentConfig.height}
+        depth={currentConfig.depth}
+        woodConfig={currentConfig.wood}
+        onReset={handleReset}
       />
     </div>
 
-    {/* Miniaturas compactas en una sola fila */}
+    {/* Miniaturas */}
     <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
       {products.map((p) => (
         <button
           key={p._id}
-          onClick={() => {
-            setSelectedProduct(p);
-            setWidth(p.width || 100);
-            setHeight(p.height || 180);
-            setDepth(p.depth || 30);
-          }}
+          onClick={() => setSelectedProduct(p)}
           className={`relative flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg border-2 transition-all overflow-hidden snap-start ${selectedProduct._id === p._id ? 'border-emerald-500 bg-emerald-500/10' : 'border-white/10 hover:border-white/30'}`}
         >
           <Image 
@@ -99,16 +136,16 @@ export default function ShowroomPage() {
       ))}
     </div>
 
-    {/* Controles compactos para móviles */}
+    {/* Controles móviles */}
     <div className="lg:hidden bg-neutral-900 p-4 rounded-2xl border border-white/5 grid grid-cols-3 gap-4">
       <div className="col-span-1">
-         <SliderControl label="Ancho" value={width} min={10} max={250} onChange={setWidth} />
+         <SliderControl label="Ancho" value={currentConfig.width} min={10} max={250} onChange={(v) => updateConfig({ width: v })} />
       </div>
       <div className="col-span-1">
-         <SliderControl label="Alto" value={height} min={10} max={250} onChange={setHeight} />
+         <SliderControl label="Alto" value={currentConfig.height} min={10} max={250} onChange={(v) => updateConfig({ height: v })} />
       </div>
       <div className="col-span-1">
-         <SliderControl label="Prof" value={depth} min={10} max={100} onChange={setDepth} />
+         <SliderControl label="Prof" value={currentConfig.depth} min={10} max={100} onChange={(v) => updateConfig({ depth: v })} />
       </div>
     </div>
   </div>
@@ -116,9 +153,9 @@ export default function ShowroomPage() {
           <aside className="hidden lg:block space-y-6">
             <div className="bg-neutral-900 p-6 rounded-2xl border border-white/5 space-y-8">
               <h3 className="font-bold text-emerald-400 uppercase tracking-widest text-sm">Ajustar Medidas</h3>
-              <SliderControl label="Ancho" value={width} min={10} max={250} onChange={setWidth} />
-              <SliderControl label="Alto" value={height} min={10} max={250} onChange={setHeight} />
-              <SliderControl label="Profundidad" value={depth} min={10} max={100} onChange={setDepth} />
+              <SliderControl label="Ancho" value={currentConfig.width} min={10} max={250} onChange={(v) => updateConfig({ width: v })} />
+              <SliderControl label="Alto" value={currentConfig.height} min={10} max={250} onChange={(v) => updateConfig({ height: v })} />
+              <SliderControl label="Profundidad" value={currentConfig.depth} min={10} max={100} onChange={(v) => updateConfig({ depth: v })} />
               
               <div className="pt-6 border-t border-white/5 space-y-4">
                 <h3 className="font-bold text-emerald-400 uppercase tracking-widest text-sm">Tipo de Madera</h3>
@@ -126,8 +163,8 @@ export default function ShowroomPage() {
                   {WOOD_TYPES.map((wood) => (
                     <button
                       key={wood.id}
-                      onClick={() => setSelectedWood(wood)}
-                      className={`flex items-center gap-2 p-2 rounded-lg border transition-all ${selectedWood.id === wood.id ? 'border-emerald-500 bg-emerald-500/10' : 'border-white/5 hover:border-white/20'}`}
+                      onClick={() => updateConfig({ wood })}
+                      className={`flex items-center gap-2 p-2 rounded-lg border transition-all ${currentConfig.wood.id === wood.id ? 'border-emerald-500 bg-emerald-500/10' : 'border-white/5 hover:border-white/20'}`}
                     >
                       <div className="w-4 h-4 rounded-full" style={{ backgroundColor: wood.color }} />
                       <span className="text-xs uppercase tracking-tighter">{wood.name}</span>

@@ -5,7 +5,6 @@ import { Canvas, ThreeEvent } from "@react-three/fiber";
 import { 
   OrbitControls, 
   Stage, 
-  Bounds, 
   useGLTF, 
   Html,
   useCursor
@@ -26,17 +25,19 @@ interface ProfessionalViewerProps {
   height?: number;
   depth?: number;
   woodConfig?: { color: string; roughness: number };
+  onReset?: () => void;
 }
 
 // --- Componente de Modelo ---
-const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig }: { 
+const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig, onLoaded }: { 
   url: string, 
   setMeshList: (list: MeshNode[]) => void,
   onMeshClick?: (name: string) => void,
   width?: number,
   height?: number,
   depth?: number,
-  woodConfig?: { color: string; roughness: number }
+  woodConfig?: { color: string; roughness: number },
+  onLoaded?: () => void
 }) => {
   const { scene } = useGLTF(url);
   const [hovered, setHovered] = useState<string | null>(null);
@@ -51,7 +52,6 @@ const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig
         const mesh = node as THREE.Mesh;
         const name = mesh.name.toLowerCase();
         
-        // Identificar si es una parte de madera
         const isWood = name.includes('wood') || 
                        name.includes('tablero') || 
                        name.includes('estante') || 
@@ -68,7 +68,6 @@ const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig
             envMapIntensity: 1
           });
         } else if (name.includes('frame') || name.includes('metal') || name.includes('hierro') || name.includes('base')) {
-          // Aseguramos que el metal sea negro mate/satinado industrial
           mesh.material = new THREE.MeshStandardMaterial({
             color: new THREE.Color('#121212'),
             roughness: 0.4,
@@ -92,27 +91,16 @@ const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig
     });
     setMeshList(meshes);
 
-    // Centrado geométrico inicial
     const box = new THREE.Box3().setFromObject(scene);
     const center = new THREE.Vector3();
     box.getCenter(center);
     scene.position.sub(center);
-  }, [scene, setMeshList]);
 
-  // Aplicar escalado en tiempo real
+    if (onLoaded) onLoaded();
+  }, [scene, setMeshList, onLoaded]);
+
   useEffect(() => {
     if (width && height && depth) {
-      // Calculamos el tamaño original del modelo para escalar correctamente
-      // Nota: Esto asume que las dimensiones proporcionadas son el objetivo final
-      // en una escala consistente (ej: 1 unit = 1cm o 1 unit = 1m)
-      // Para este caso, vamos a escalar el objeto para que su bounding box coincida con las medidas.
-      const box = new THREE.Box3().setFromObject(scene);
-      const size = new THREE.Vector3();
-      box.getSize(size);
-
-      // Aplicamos el escalado al objeto raíz de la escena
-      // Ajuste simplificado: si queremos que mida 'width' de ancho, etc.
-      // Usamos el tamaño actual sin escala para determinar el factor.
       scene.scale.set(1, 1, 1);
       const currentBox = new THREE.Box3().setFromObject(scene);
       const currentSize = new THREE.Vector3();
@@ -124,7 +112,6 @@ const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig
         depth / (currentSize.z || 1)
       );
 
-      // Re-centrar después de escalar
       const newBox = new THREE.Box3().setFromObject(scene);
       const newCenter = new THREE.Vector3();
       newBox.getCenter(newCenter);
@@ -151,9 +138,14 @@ const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig
 };
 
 // --- Visor Principal ---
-export default function ProfessionalViewer({ modelUrl, onMeshClick, width, height, depth, woodConfig }: ProfessionalViewerProps) {
+export default function ProfessionalViewer({ modelUrl, onMeshClick, width, height, depth, woodConfig, onReset }: ProfessionalViewerProps) {
   const [meshList, setMeshList] = useState<MeshNode[]>([]);
   const [visibleMeshes, setVisibleMeshes] = useState<Record<string, boolean>>({});
+  const [shouldAdjust, setShouldAdjust] = useState(true);
+
+  useEffect(() => {
+    setShouldAdjust(true);
+  }, [modelUrl]);
 
   const toggleMeshVisibility = (name: string) => {
     setVisibleMeshes(prev => ({
@@ -162,10 +154,22 @@ export default function ProfessionalViewer({ modelUrl, onMeshClick, width, heigh
     }));
   };
 
+  const handleModelLoaded = () => {
+    setTimeout(() => {
+      setShouldAdjust(false);
+    }, 100);
+  };
+
+  const internalReset = () => {
+    setShouldAdjust(true);
+    if (onReset) onReset();
+  };
+
   return (
     <div className="relative w-full h-full bg-neutral-900 rounded-xl overflow-hidden shadow-2xl">
       <Canvas
         shadows
+        camera={{ fov: 45, position: [0, 0, 10] }}
         gl={{ 
           antialias: true, 
           toneMapping: THREE.ACESFilmicToneMapping,
@@ -179,9 +183,10 @@ export default function ProfessionalViewer({ modelUrl, onMeshClick, width, heigh
             intensity={0.5} 
             environment="city" 
             shadows={{ type: 'contact', opacity: 0.4, blur: 2 }} 
-            adjustCamera={true}
+            adjustCamera={shouldAdjust}
           >
-            <Bounds fit clip>
+            {/* Escalamos un poquito el grupo para que no ocupe todo el encuadre de Stage */}
+            <group scale={0.85}>
               <Model 
                 url={modelUrl} 
                 setMeshList={setMeshList}
@@ -190,8 +195,9 @@ export default function ProfessionalViewer({ modelUrl, onMeshClick, width, heigh
                 height={height}
                 depth={depth}
                 woodConfig={woodConfig}
+                onLoaded={handleModelLoaded}
               />
-            </Bounds>
+            </group>
           </Stage>
 
           <OrbitControls 
@@ -199,20 +205,34 @@ export default function ProfessionalViewer({ modelUrl, onMeshClick, width, heigh
             minPolarAngle={0} 
             maxPolarAngle={Math.PI} 
             enableDamping
+            onStart={() => setShouldAdjust(false)}
           />
         </Suspense>
       </Canvas>
 
-      {/* UI Overlay para control de Meshes */}
-      <div className="absolute top-4 left-4 p-4 bg-black/60 backdrop-blur-md rounded-lg text-white text-xs max-h-[80%] overflow-y-auto w-48">
-        <h3 className="font-bold mb-2 uppercase tracking-wider">Meshes detectados</h3>
+      {/* UI Overlay mejorada con Reset */}
+      <div className="absolute top-4 left-4 p-4 bg-black/60 backdrop-blur-md rounded-lg text-white text-xs max-h-[70%] overflow-y-auto w-52 border border-white/10">
+        <div className="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
+          <h3 className="font-bold uppercase tracking-wider text-emerald-400">Panel 3D</h3>
+          <button 
+            onClick={internalReset}
+            className="px-2 py-1 bg-emerald-500 hover:bg-emerald-600 text-black rounded text-[10px] font-bold transition-all flex items-center gap-1"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            RESET
+          </button>
+        </div>
+        
+        <p className="text-[10px] text-neutral-400 mb-3 italic">Las medidas y materiales persisten al cambiar de modelo.</p>
+
+        <h3 className="font-medium mb-2 text-neutral-300 uppercase text-[9px] tracking-widest">Piezas detectadas</h3>
         <ul className="space-y-1">
           {meshList.map(mesh => (
-            <li key={mesh.uuid} className="flex items-center justify-between gap-2">
-              <span className="truncate">{mesh.name || 'Sin nombre'}</span>
+            <li key={mesh.uuid} className="flex items-center justify-between gap-2 p-1 hover:bg-white/5 rounded transition-colors">
+              <span className="truncate max-w-[100px] text-neutral-400">{mesh.name || 'Componente'}</span>
               <button 
                 onClick={() => toggleMeshVisibility(mesh.name)}
-                className={`px-2 py-0.5 rounded ${visibleMeshes[mesh.name] === false ? 'bg-red-500' : 'bg-emerald-500'}`}
+                className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase ${visibleMeshes[mesh.name] === false ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`}
               >
                 {visibleMeshes[mesh.name] === false ? 'Oculto' : 'Visible'}
               </button>

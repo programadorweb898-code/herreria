@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Suspense, useState, useEffect, useRef } from "react";
-import { Canvas, ThreeEvent } from "@react-three/fiber";
+import { Canvas, ThreeEvent, useThree } from "@react-three/fiber";
 import { 
   OrbitControls, 
   Stage, 
@@ -35,6 +35,57 @@ interface ProfessionalViewerProps {
   cameraState?: CameraState;
   onCameraChange?: (state: CameraState) => void;
 }
+
+// --- Componente de Controles Dinámicos ---
+const DynamicOrbitControls = ({ 
+  controlsRef, 
+  onCameraChange, 
+  setShouldAdjust,
+  objWidth
+}: { 
+  controlsRef: React.RefObject<OrbitControlsImpl>, 
+  onCameraChange: () => void, 
+  setShouldAdjust: (val: boolean) => void,
+  objWidth: number
+}) => {
+  const { size, camera } = useThree();
+  
+  // Calculamos la distancia necesaria para que el objeto ocupe X porcentaje del ancho
+  // Basado en: visibleWidth = 2 * Math.tan(fov/2) * distance * aspect
+  const getDistanceForPercent = (percent: number) => {
+    const perspectiveCamera = camera as THREE.PerspectiveCamera;
+    const fovRad = (perspectiveCamera.fov * Math.PI) / 180;
+    const aspect = size.width / size.height;
+    
+    // Queremos que objWidth / visibleWidth = percent
+    // visibleWidth = objWidth / percent
+    const targetVisibleWidth = objWidth / percent;
+    
+    // distance = targetVisibleWidth / (2 * Math.tan(fovRad/2) * aspect)
+    return targetVisibleWidth / (2 * Math.tan(fovRad / 2) * aspect);
+  };
+
+  // Límite de acercamiento (zoom in): objeto al 70% del ancho
+  const minDistance = getDistanceForPercent(0.7);
+  // Límite de alejamiento (zoom out): objeto al 25% del ancho (para que no se pierda)
+  const maxDistance = getDistanceForPercent(0.25);
+
+  return (
+    <OrbitControls 
+      ref={controlsRef}
+      makeDefault 
+      enableZoom={true}
+      minDistance={minDistance}
+      maxDistance={maxDistance}
+      minPolarAngle={0} 
+      maxPolarAngle={Math.PI} 
+      enableDamping
+      dampingFactor={0.1}
+      onStart={() => setShouldAdjust(false)}
+      onEnd={onCameraChange}
+    />
+  );
+};
 
 // --- Componente de Modelo ---
 const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig, onLoaded }: { 
@@ -196,10 +247,10 @@ export default function ProfessionalViewer({ modelUrl, onMeshClick, width, heigh
   };
 
   return (
-    <div className="relative w-full h-full bg-neutral-900 rounded-xl overflow-hidden shadow-2xl">
+    <div className="relative w-full h-full bg-neutral-900 rounded-xl overflow-hidden shadow-2xl touch-none">
       <Canvas
         shadows
-        camera={{ fov: 45, position: [0, 0, 10] }}
+        camera={{ fov: 45, position: [200, 200, 200] }}
         gl={{ 
           antialias: true, 
           toneMapping: THREE.ACESFilmicToneMapping,
@@ -229,18 +280,11 @@ export default function ProfessionalViewer({ modelUrl, onMeshClick, width, heigh
             </group>
           </Stage>
 
-          <OrbitControls 
-            ref={controlsRef}
-            makeDefault 
-            enableZoom={true}
-            minDistance={0.5}
-            maxDistance={50}
-            minPolarAngle={0} 
-            maxPolarAngle={Math.PI} 
-            enableDamping
-            dampingFactor={0.05}
-            onStart={() => setShouldAdjust(false)}
-            onEnd={handleCameraChange}
+          <DynamicOrbitControls 
+            controlsRef={controlsRef}
+            onCameraChange={handleCameraChange}
+            setShouldAdjust={setShouldAdjust}
+            objWidth={Math.max(width || 100, depth || 100)}
           />
         </Suspense>
       </Canvas>

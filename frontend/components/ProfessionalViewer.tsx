@@ -151,7 +151,7 @@ const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig
 };
 
 // --- Visor Principal ---
-export default function ProfessionalViewer({ modelUrl, onMeshClick, width, height, depth }: ProfessionalViewerProps) {
+export default function ProfessionalViewer({ modelUrl, onMeshClick, width, height, depth, woodConfig }: ProfessionalViewerProps) {
   const [meshList, setMeshList] = useState<MeshNode[]>([]);
   const [visibleMeshes, setVisibleMeshes] = useState<Record<string, boolean>>({});
 

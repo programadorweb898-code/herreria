@@ -56,8 +56,11 @@ export default function ShowroomPage() {
         const initialConfigs: typeof productConfigs = {};
         data.forEach(p => {
           // Prioridad: 1. Lo guardado en LocalStorage, 2. Los defaults del producto
+          // Caso especial: Bodega Milán en showroom por defecto 35cm
+          const isBodegaMilan = p.slug === 'estanteria-pared-lineal';
+          
           initialConfigs[p._id] = savedConfigs[p._id] || {
-            width: p.width || 100,
+            width: isBodegaMilan ? 35 : (p.width || 100),
             height: p.height || 180,
             depth: p.depth || 30,
             wood: WOOD_TYPES[0]
@@ -111,6 +114,7 @@ export default function ShowroomPage() {
     {/* Visor 3D */}
     <div className="relative bg-neutral-900 rounded-2xl p-2 border border-white/5 h-[400px] sm:h-[600px] overflow-hidden">
       <ProfessionalViewer 
+        key={selectedProduct._id}
         modelUrl={selectedProduct.modelPath || ""} 
         width={currentConfig.width}
         height={currentConfig.height}

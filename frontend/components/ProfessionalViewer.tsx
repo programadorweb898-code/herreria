@@ -232,9 +232,13 @@ export default function ProfessionalViewer({ modelUrl, onMeshClick, width, heigh
           <OrbitControls 
             ref={controlsRef}
             makeDefault 
+            enableZoom={true}
+            minDistance={0.5}
+            maxDistance={50}
             minPolarAngle={0} 
             maxPolarAngle={Math.PI} 
             enableDamping
+            dampingFactor={0.05}
             onStart={() => setShouldAdjust(false)}
             onEnd={handleCameraChange}
           />

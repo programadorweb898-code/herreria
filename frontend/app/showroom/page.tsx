@@ -101,7 +101,7 @@ export default function ShowroomPage() {
               
               <div className="pt-6 border-t border-white/5 space-y-2">
                  <p className="text-neutral-500 text-xs">Producto: {selectedProduct.name}</p>
-                 <p className="text-neutral-400 text-xs italic">"{selectedProduct.description}"</p>
+                 <p className="text-neutral-400 text-xs italic">&quot;{selectedProduct.description}&quot;</p>
               </div>
             </div>
           </aside>

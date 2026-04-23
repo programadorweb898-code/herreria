@@ -145,15 +145,33 @@ export default function ShowroomPage() {
     </div>
 
     {/* Controles móviles */}
-    <div className="lg:hidden bg-neutral-900 p-4 rounded-2xl border border-white/5 grid grid-cols-3 gap-4">
-      <div className="col-span-1">
-         <SliderControl label="Ancho" value={currentConfig.width} min={10} max={250} onChange={(v) => updateConfig({ width: v })} />
+    <div className="lg:hidden space-y-4">
+      <div className="bg-neutral-900 p-4 rounded-2xl border border-white/5 grid grid-cols-3 gap-4">
+        <div className="col-span-1">
+           <SliderControl label="Ancho" value={currentConfig.width} min={10} max={250} onChange={(v) => updateConfig({ width: v })} />
+        </div>
+        <div className="col-span-1">
+           <SliderControl label="Alto" value={currentConfig.height} min={10} max={250} onChange={(v) => updateConfig({ height: v })} />
+        </div>
+        <div className="col-span-1">
+           <SliderControl label="Prof" value={currentConfig.depth} min={10} max={100} onChange={(v) => updateConfig({ depth: v })} />
+        </div>
       </div>
-      <div className="col-span-1">
-         <SliderControl label="Alto" value={currentConfig.height} min={10} max={250} onChange={(v) => updateConfig({ height: v })} />
-      </div>
-      <div className="col-span-1">
-         <SliderControl label="Prof" value={currentConfig.depth} min={10} max={100} onChange={(v) => updateConfig({ depth: v })} />
+
+      <div className="bg-neutral-900 p-4 rounded-2xl border border-white/5">
+        <h3 className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.2em] mb-3">Tipo de Madera</h3>
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          {WOOD_TYPES.map((wood) => (
+            <button
+              key={wood.id}
+              onClick={() => updateConfig({ wood })}
+              className={`flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${currentConfig.wood.id === wood.id ? 'border-emerald-500 bg-emerald-500/10' : 'border-white/5 bg-neutral-950/50'}`}
+            >
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: wood.color }} />
+              <span className="text-[10px] font-bold uppercase tracking-tight text-neutral-300">{wood.name}</span>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   </div>

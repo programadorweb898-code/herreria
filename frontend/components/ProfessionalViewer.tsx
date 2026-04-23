@@ -79,7 +79,10 @@ const DynamicOrbitControls = ({
       maxDistance={maxDistance}
       minPolarAngle={0} 
       maxPolarAngle={Math.PI} 
-      enableDamping={false}
+      enableDamping={true}
+      dampingFactor={0.05}
+      rotateSpeed={0.8}
+      zoomSpeed={1.2}
       onStart={() => setShouldAdjust(false)}
       onEnd={onCameraChange}
     />
@@ -155,7 +158,7 @@ const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig
     scene.position.sub(center);
 
     if (onLoaded) onLoaded();
-  }, [scene, setMeshList, onLoaded]);
+  }, [scene, setMeshList]); // Quitamos onLoaded de dependencias para evitar loops
 
   useEffect(() => {
     if (width && height && depth) {
@@ -203,9 +206,8 @@ export default function ProfessionalViewer({ modelUrl, onMeshClick, width, heigh
   const controlsRef = useRef<OrbitControlsImpl>(null);
 
   const hasCameraState = !!cameraState;
+  
   useEffect(() => {
-    // Si ya tenemos un zoom guardado, desactivamos el ajuste automático del Stage
-    // para evitar que "pelee" con nuestra posición guardada.
     setShouldAdjust(!hasCameraState);
   }, [modelUrl, hasCameraState]);
 
@@ -216,8 +218,7 @@ export default function ProfessionalViewer({ modelUrl, onMeshClick, width, heigh
     }));
   };
 
-  const handleModelLoaded = () => {
-    // Si hay un estado guardado para este producto, lo aplicamos al terminar de cargar
+  const handleModelLoaded = React.useCallback(() => {
     if (cameraState && controlsRef.current) {
       const { position, target } = cameraState;
       controlsRef.current.object.position.set(...position);
@@ -225,25 +226,24 @@ export default function ProfessionalViewer({ modelUrl, onMeshClick, width, heigh
       controlsRef.current.update();
       setShouldAdjust(false);
     } else {
-      // Si no hay estado, dejamos que Stage ajuste y luego desactivamos el ajuste continuo
       setTimeout(() => {
         setShouldAdjust(false);
       }, 100);
     }
-  };
+  }, [cameraState]);
 
   const internalReset = () => {
     setShouldAdjust(true);
     if (onReset) onReset();
   };
 
-  const handleCameraChange = () => {
+  const handleCameraChange = React.useCallback(() => {
     if (onCameraChange && controlsRef.current) {
       const position = controlsRef.current.object.position.toArray() as [number, number, number];
       const target = controlsRef.current.target.toArray() as [number, number, number];
       onCameraChange({ position, target });
     }
-  };
+  }, [onCameraChange]);
 
   return (
     <div className="relative w-full h-full bg-neutral-900 rounded-xl overflow-hidden shadow-2xl touch-none">

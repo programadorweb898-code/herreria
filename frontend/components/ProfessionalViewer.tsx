@@ -180,15 +180,24 @@ const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig
                        name.includes('box');
 
         if (isWood) {
-          mesh.material = new THREE.MeshStandardMaterial({
-            map: woodTexture,
-            color: new THREE.Color(woodConfig.color),
-            roughness: woodConfig.roughness,
-            metalness: 0.05,
-            bumpMap: woodTexture,
-            bumpScale: 0.02,
-            envMapIntensity: 0.8
-          });
+          // Si el material ya existe, actualizamos sus propiedades
+          if (mesh.material instanceof THREE.MeshStandardMaterial) {
+            mesh.material.map = woodTexture;
+            mesh.material.color = new THREE.Color(woodConfig.color);
+            mesh.material.roughness = woodConfig.roughness;
+            mesh.material.needsUpdate = true; // Marcar para que Three.js actualice el material
+          } else {
+            // Si no, creamos uno nuevo
+            mesh.material = new THREE.MeshStandardMaterial({
+              map: woodTexture,
+              color: new THREE.Color(woodConfig.color),
+              roughness: woodConfig.roughness,
+              metalness: 0.05,
+              bumpMap: woodTexture,
+              bumpScale: 0.02,
+              envMapIntensity: 0.8
+            });
+          }
         } else if (name.includes('frame') || name.includes('metal') || name.includes('hierro') || name.includes('base') || name.includes('structure')) {
           mesh.material = new THREE.MeshStandardMaterial({
             color: new THREE.Color('#1a1a1a'),
@@ -199,7 +208,9 @@ const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig
         }
       }
     });
-  }, [scene, woodConfig]);
+  // Añadimos woodConfig.color y woodConfig.roughness a las dependencias para asegurar que el efecto se ejecute
+  // cuando cambien los valores específicos de color o rugosidad.
+  }, [scene, woodConfig, woodConfig?.color, woodConfig?.roughness]);
 
   useEffect(() => {
     const meshes: MeshNode[] = [];
@@ -262,8 +273,6 @@ const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig
 
 // --- Visor Principal ---
 export default function ProfessionalViewer({ modelUrl, onMeshClick, width, height, depth, woodConfig, onReset, cameraState, onCameraChange }: ProfessionalViewerProps) {
-  const [meshList, setMeshList] = useState<MeshNode[]>([]);
-  const [visibleMeshes, setVisibleMeshes] = useState<Record<string, boolean>>({});
   const [shouldAdjust, setShouldAdjust] = useState(true);
   const controlsRef = useRef<OrbitControlsImpl>(null);
 
@@ -273,12 +282,12 @@ export default function ProfessionalViewer({ modelUrl, onMeshClick, width, heigh
     setShouldAdjust(!hasCameraState);
   }, [modelUrl, hasCameraState]);
 
-  const toggleMeshVisibility = (name: string) => {
-    setVisibleMeshes(prev => ({
-      ...prev,
-      [name]: prev[name] === false
-    }));
-  };
+  // const toggleMeshVisibility = (name: string) => {
+  //   setVisibleMeshes(prev => ({
+  //     ...prev,
+  //     [name]: prev[name] === false
+  //   }));
+  // };
 
   const handleModelLoaded = React.useCallback(() => {
     if (cameraState && controlsRef.current) {
@@ -351,35 +360,16 @@ export default function ProfessionalViewer({ modelUrl, onMeshClick, width, heigh
         </Suspense>
       </Canvas>
 
-      {/* UI Overlay mejorada con Reset */}
-      <div className="absolute top-4 left-4 p-4 bg-black/60 backdrop-blur-md rounded-lg text-white text-xs max-h-[70%] overflow-y-auto w-52 border border-white/10">
-        <div className="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
-          <h3 className="font-bold uppercase tracking-wider text-emerald-400">Panel 3D</h3>
-          <button 
-            onClick={internalReset}
-            className="px-2 py-1 bg-emerald-500 hover:bg-emerald-600 text-black rounded text-[10px] font-bold transition-all flex items-center gap-1"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-            RESET
-          </button>
-        </div>
-        
-        <p className="text-[10px] text-neutral-400 mb-3 italic">Las medidas y materiales persisten al cambiar de modelo.</p>
-
-        <h3 className="font-medium mb-2 text-neutral-300 uppercase text-[9px] tracking-widest">Piezas detectadas</h3>
-        <ul className="space-y-1">
-          {meshList.map(mesh => (
-            <li key={mesh.uuid} className="flex items-center justify-between gap-2 p-1 hover:bg-white/5 rounded transition-colors">
-              <span className="truncate max-w-[100px] text-neutral-400">{mesh.name || 'Componente'}</span>
-              <button 
-                onClick={() => toggleMeshVisibility(mesh.name)}
-                className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase ${visibleMeshes[mesh.name] === false ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`}
-              >
-                {visibleMeshes[mesh.name] === false ? 'Oculto' : 'Visible'}
-              </button>
-            </li>
-          ))}
-        </ul>
+      {/* Botón de Reset */}
+      <div className="absolute top-4 left-4">
+        <button 
+          onClick={internalReset}
+          className="px-3 py-2 bg-black/60 backdrop-blur-md hover:bg-black/80 text-white rounded-lg text-[10px] font-bold transition-all flex items-center gap-2 border border-white/10 shadow-lg"
+          title="Reiniciar Vista"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          RESET
+        </button>
       </div>
     </div>
   );

@@ -22,17 +22,62 @@ interface MeshNode {
 interface ProfessionalViewerProps {
   modelUrl: string;
   onMeshClick?: (meshName: string) => void;
+  width?: number;
+  height?: number;
+  depth?: number;
+  woodConfig?: { color: string; roughness: number };
 }
 
 // --- Componente de Modelo ---
-const Model = ({ url, setMeshList, onMeshClick }: { 
+const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig }: { 
   url: string, 
   setMeshList: (list: MeshNode[]) => void,
-  onMeshClick?: (name: string) => void 
+  onMeshClick?: (name: string) => void,
+  width?: number,
+  height?: number,
+  depth?: number,
+  woodConfig?: { color: string; roughness: number }
 }) => {
   const { scene } = useGLTF(url);
   const [hovered, setHovered] = useState<string | null>(null);
   useCursor(!!hovered);
+
+  // Aplicar material de madera
+  useEffect(() => {
+    if (!woodConfig) return;
+
+    scene.traverse((node) => {
+      if ((node as THREE.Mesh).isMesh) {
+        const mesh = node as THREE.Mesh;
+        const name = mesh.name.toLowerCase();
+        
+        // Identificar si es una parte de madera
+        const isWood = name.includes('wood') || 
+                       name.includes('tablero') || 
+                       name.includes('estante') || 
+                       name.includes('board') || 
+                       name.includes('shelf') || 
+                       name.includes('top') ||
+                       name.includes('madera');
+
+        if (isWood) {
+          mesh.material = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(woodConfig.color),
+            roughness: woodConfig.roughness,
+            metalness: 0.1,
+            envMapIntensity: 1
+          });
+        } else if (name.includes('frame') || name.includes('metal') || name.includes('hierro') || name.includes('base')) {
+          // Aseguramos que el metal sea negro mate/satinado industrial
+          mesh.material = new THREE.MeshStandardMaterial({
+            color: new THREE.Color('#121212'),
+            roughness: 0.4,
+            metalness: 0.8
+          });
+        }
+      }
+    });
+  }, [scene, woodConfig]);
 
   useEffect(() => {
     const meshes: MeshNode[] = [];
@@ -46,7 +91,55 @@ const Model = ({ url, setMeshList, onMeshClick }: {
       }
     });
     setMeshList(meshes);
+
+    // Centrado geométrico inicial
+    const box = new THREE.Box3().setFromObject(scene);
+    const center = new THREE.Vector3();
+    box.getCenter(center);
+    scene.position.sub(center);
   }, [scene, setMeshList]);
+
+  // Aplicar escalado en tiempo real
+  useEffect(() => {
+    if (width && height && depth) {
+      // Calculamos el tamaño original del modelo para escalar correctamente
+      // Nota: Esto asume que las dimensiones proporcionadas son el objetivo final
+      // en una escala consistente (ej: 1 unit = 1cm o 1 unit = 1m)
+      // Para este caso, vamos a escalar el objeto para que su bounding box coincida con las medidas.
+      const box = new THREE.Box3().setFromObject(scene);
+      const size = new THREE.Vector3();
+      box.getSize(size);
+
+      // Evitamos división por cero
+      const scaleX = width / (size.x || 1);
+      const scaleY = height / (size.y || 1);
+      const scaleZ = depth / (size.z || 1);
+
+      // Aplicamos el escalado al objeto raíz de la escena
+      // scene.scale.set(scaleX, scaleY, scaleZ); 
+      // Sin embargo, setFromObject con scale puede ser tricky. 
+      // Es mejor usar una escala base y ajustarla.
+      
+      // Ajuste simplificado: si queremos que mida 'width' de ancho, etc.
+      // Usamos el tamaño actual sin escala para determinar el factor.
+      scene.scale.set(1, 1, 1);
+      const currentBox = new THREE.Box3().setFromObject(scene);
+      const currentSize = new THREE.Vector3();
+      currentBox.getSize(currentSize);
+      
+      scene.scale.set(
+        width / (currentSize.x || 1),
+        height / (currentSize.y || 1),
+        depth / (currentSize.z || 1)
+      );
+
+      // Re-centrar después de escalar
+      const newBox = new THREE.Box3().setFromObject(scene);
+      const newCenter = new THREE.Vector3();
+      newBox.getCenter(newCenter);
+      scene.position.sub(newCenter);
+    }
+  }, [width, height, depth, scene]);
 
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
@@ -67,7 +160,7 @@ const Model = ({ url, setMeshList, onMeshClick }: {
 };
 
 // --- Visor Principal ---
-export default function ProfessionalViewer({ modelUrl, onMeshClick }: ProfessionalViewerProps) {
+export default function ProfessionalViewer({ modelUrl, onMeshClick, width, height, depth }: ProfessionalViewerProps) {
   const [meshList, setMeshList] = useState<MeshNode[]>([]);
   const [visibleMeshes, setVisibleMeshes] = useState<Record<string, boolean>>({});
 
@@ -88,21 +181,24 @@ export default function ProfessionalViewer({ modelUrl, onMeshClick }: Profession
           outputColorSpace: THREE.SRGBColorSpace,
           preserveDrawingBuffer: true 
         }}
-        dpr={[1, 2]} // Performance: limit DPI for high-res screens
+        dpr={[1, 2]}
       >
         <Suspense fallback={<Loader />}>
-          {/* Iluminación y Entorno */}
           <Stage 
             intensity={0.5} 
             environment="city" 
             shadows={{ type: 'contact', opacity: 0.4, blur: 2 }} 
-            adjustCamera={false}
+            adjustCamera={true}
           >
             <Bounds fit clip>
               <Model 
                 url={modelUrl} 
                 setMeshList={setMeshList}
                 onMeshClick={onMeshClick}
+                width={width}
+                height={height}
+                depth={depth}
+                woodConfig={woodConfig}
               />
             </Bounds>
           </Stage>
@@ -110,7 +206,7 @@ export default function ProfessionalViewer({ modelUrl, onMeshClick }: Profession
           <OrbitControls 
             makeDefault 
             minPolarAngle={0} 
-            maxPolarAngle={Math.PI / 1.75} 
+            maxPolarAngle={Math.PI} 
             enableDamping
           />
         </Suspense>

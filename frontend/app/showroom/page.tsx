@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { getProducts } from "@/data/products";
 import type { Product } from "@/types/product";
 
@@ -20,6 +21,13 @@ function SliderControl({ label, value, min, max, onChange }: { label: string; va
   );
 }
 
+const WOOD_TYPES = [
+  { id: 'paraiso', name: 'Paraíso', color: '#d2b48c', roughness: 0.6 },
+  { id: 'petiribi', name: 'Petiribí', color: '#8b5a2b', roughness: 0.4 },
+  { id: 'nogal', name: 'Nogal', color: '#3d2b1f', roughness: 0.3 },
+  { id: 'roble', name: 'Roble', color: '#b58b5c', roughness: 0.5 },
+];
+
 export default function ShowroomPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -27,9 +35,11 @@ export default function ShowroomPage() {
   const [width, setWidth] = useState(100);
   const [height, setHeight] = useState(180);
   const [depth, setDepth] = useState(30);
+  const [selectedWood, setSelectedWood] = useState(WOOD_TYPES[0]);
 
   useEffect(() => {
     async function loadProducts() {
+// ... (loadProducts logic)
       const data = await getProducts();
       setProducts(data);
       if (data.length > 0) {
@@ -54,14 +64,20 @@ export default function ShowroomPage() {
           </h1>
         </header>
 <section className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6">
-  <div className="space-y-4">
+  <div className="space-y-4 overflow-hidden">
     {/* Visor 3D: altura optimizada */}
-    <div className="relative bg-neutral-900 rounded-2xl p-2 border border-white/5 h-[400px] sm:h-[500px] overflow-hidden">
-      <ProfessionalViewer modelUrl={selectedProduct.modelPath || ""} />
+    <div className="relative bg-neutral-900 rounded-2xl p-2 border border-white/5 h-[400px] sm:h-[600px] overflow-hidden">
+      <ProfessionalViewer 
+        modelUrl={selectedProduct.modelPath || ""} 
+        width={width}
+        height={height}
+        depth={depth}
+        woodConfig={selectedWood}
+      />
     </div>
 
-    {/* Miniaturas compactas */}
-    <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+    {/* Miniaturas compactas en una sola fila */}
+    <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
       {products.map((p) => (
         <button
           key={p._id}
@@ -71,9 +87,14 @@ export default function ShowroomPage() {
             setHeight(p.height || 180);
             setDepth(p.depth || 30);
           }}
-          className={`aspect-square rounded-lg border-2 transition-all p-1 ${selectedProduct._id === p._id ? 'border-emerald-500' : 'border-white/10'}`}
+          className={`relative flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg border-2 transition-all overflow-hidden snap-start ${selectedProduct._id === p._id ? 'border-emerald-500 bg-emerald-500/10' : 'border-white/10 hover:border-white/30'}`}
         >
-          <span className="text-[9px] uppercase font-bold truncate block">{p.name.split(' ')[0]}</span>
+          <Image 
+            src={p.image} 
+            alt={p.name}
+            fill
+            className="object-cover"
+          />
         </button>
       ))}
     </div>
@@ -99,6 +120,22 @@ export default function ShowroomPage() {
               <SliderControl label="Alto" value={height} min={10} max={250} onChange={setHeight} />
               <SliderControl label="Profundidad" value={depth} min={10} max={100} onChange={setDepth} />
               
+              <div className="pt-6 border-t border-white/5 space-y-4">
+                <h3 className="font-bold text-emerald-400 uppercase tracking-widest text-sm">Tipo de Madera</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {WOOD_TYPES.map((wood) => (
+                    <button
+                      key={wood.id}
+                      onClick={() => setSelectedWood(wood)}
+                      className={`flex items-center gap-2 p-2 rounded-lg border transition-all ${selectedWood.id === wood.id ? 'border-emerald-500 bg-emerald-500/10' : 'border-white/5 hover:border-white/20'}`}
+                    >
+                      <div className="w-4 h-4 rounded-full" style={{ backgroundColor: wood.color }} />
+                      <span className="text-xs uppercase tracking-tighter">{wood.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="pt-6 border-t border-white/5 space-y-2">
                  <p className="text-neutral-500 text-xs">Producto: {selectedProduct.name}</p>
                  <p className="text-neutral-400 text-xs italic">&quot;{selectedProduct.description}&quot;</p>

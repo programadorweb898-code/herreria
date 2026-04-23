@@ -79,7 +79,7 @@ export default function ProfessionalViewer({ modelUrl, onMeshClick }: Profession
   };
 
   return (
-    <div className="relative w-full h-[600px] bg-neutral-900 rounded-xl overflow-hidden shadow-2xl">
+    <div className="relative w-full h-full bg-neutral-900 rounded-xl overflow-hidden shadow-2xl">
       <Canvas
         shadows
         gl={{ 

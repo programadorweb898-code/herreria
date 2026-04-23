@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useState, useEffect } from "react";
+import React, { Suspense, useState, useEffect, useRef } from "react";
 import { Canvas, ThreeEvent } from "@react-three/fiber";
 import { 
   OrbitControls, 
@@ -10,8 +10,14 @@ import {
   useCursor
 } from "@react-three/drei";
 import * as THREE from "three";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 
 // --- Tipos ---
+export interface CameraState {
+  position: [number, number, number];
+  target: [number, number, number];
+}
+
 interface MeshNode {
   name: string;
   uuid: string;
@@ -26,6 +32,8 @@ interface ProfessionalViewerProps {
   depth?: number;
   woodConfig?: { color: string; roughness: number };
   onReset?: () => void;
+  cameraState?: CameraState;
+  onCameraChange?: (state: CameraState) => void;
 }
 
 // --- Componente de Modelo ---
@@ -138,14 +146,18 @@ const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig
 };
 
 // --- Visor Principal ---
-export default function ProfessionalViewer({ modelUrl, onMeshClick, width, height, depth, woodConfig, onReset }: ProfessionalViewerProps) {
+export default function ProfessionalViewer({ modelUrl, onMeshClick, width, height, depth, woodConfig, onReset, cameraState, onCameraChange }: ProfessionalViewerProps) {
   const [meshList, setMeshList] = useState<MeshNode[]>([]);
   const [visibleMeshes, setVisibleMeshes] = useState<Record<string, boolean>>({});
   const [shouldAdjust, setShouldAdjust] = useState(true);
+  const controlsRef = useRef<OrbitControlsImpl>(null);
 
+  const hasCameraState = !!cameraState;
   useEffect(() => {
-    setShouldAdjust(true);
-  }, [modelUrl]);
+    // Si ya tenemos un zoom guardado, desactivamos el ajuste automático del Stage
+    // para evitar que "pelee" con nuestra posición guardada.
+    setShouldAdjust(!hasCameraState);
+  }, [modelUrl, hasCameraState]);
 
   const toggleMeshVisibility = (name: string) => {
     setVisibleMeshes(prev => ({
@@ -155,14 +167,32 @@ export default function ProfessionalViewer({ modelUrl, onMeshClick, width, heigh
   };
 
   const handleModelLoaded = () => {
-    setTimeout(() => {
+    // Si hay un estado guardado para este producto, lo aplicamos al terminar de cargar
+    if (cameraState && controlsRef.current) {
+      const { position, target } = cameraState;
+      controlsRef.current.object.position.set(...position);
+      controlsRef.current.target.set(...target);
+      controlsRef.current.update();
       setShouldAdjust(false);
-    }, 100);
+    } else {
+      // Si no hay estado, dejamos que Stage ajuste y luego desactivamos el ajuste continuo
+      setTimeout(() => {
+        setShouldAdjust(false);
+      }, 100);
+    }
   };
 
   const internalReset = () => {
     setShouldAdjust(true);
     if (onReset) onReset();
+  };
+
+  const handleCameraChange = () => {
+    if (onCameraChange && controlsRef.current) {
+      const position = controlsRef.current.object.position.toArray() as [number, number, number];
+      const target = controlsRef.current.target.toArray() as [number, number, number];
+      onCameraChange({ position, target });
+    }
   };
 
   return (
@@ -185,7 +215,6 @@ export default function ProfessionalViewer({ modelUrl, onMeshClick, width, heigh
             shadows={{ type: 'contact', opacity: 0.4, blur: 2 }} 
             adjustCamera={shouldAdjust}
           >
-            {/* Escalamos un poquito el grupo para que no ocupe todo el encuadre de Stage */}
             <group scale={0.85}>
               <Model 
                 url={modelUrl} 
@@ -201,11 +230,13 @@ export default function ProfessionalViewer({ modelUrl, onMeshClick, width, heigh
           </Stage>
 
           <OrbitControls 
+            ref={controlsRef}
             makeDefault 
             minPolarAngle={0} 
             maxPolarAngle={Math.PI} 
             enableDamping
             onStart={() => setShouldAdjust(false)}
+            onEnd={handleCameraChange}
           />
         </Suspense>
       </Canvas>

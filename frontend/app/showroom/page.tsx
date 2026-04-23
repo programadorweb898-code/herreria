@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { getProducts } from "@/data/products";
 import type { Product } from "@/types/product";
+import type { CameraState } from "@/components/ProfessionalViewer";
 
 const ProfessionalViewer = dynamic(() => import("@/components/ProfessionalViewer"), { ssr: false });
 
@@ -37,6 +38,7 @@ export default function ShowroomPage() {
     height: number;
     depth: number;
     wood: typeof WOOD_TYPES[0];
+    cameraState?: CameraState;
   }>>({});
 
   // 1. Cargar productos e inicializar configuraciones
@@ -114,6 +116,8 @@ export default function ShowroomPage() {
         height={currentConfig.height}
         depth={currentConfig.depth}
         woodConfig={currentConfig.wood}
+        cameraState={currentConfig.cameraState}
+        onCameraChange={(state: CameraState) => updateConfig({ cameraState: state })}
         onReset={handleReset}
       />
     </div>
@@ -130,7 +134,7 @@ export default function ShowroomPage() {
             src={p.image} 
             alt={p.name}
             fill
-            className="object-cover"
+            className={`object-cover transition-all duration-500 ${selectedProduct._id === p._id ? 'grayscale-0 scale-110' : 'grayscale'}`}
           />
         </button>
       ))}

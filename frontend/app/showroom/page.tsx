@@ -23,10 +23,10 @@ function SliderControl({ label, value, min, max, onChange }: { label: string; va
 }
 
 const WOOD_TYPES = [
-  { id: 'paraiso', name: 'Paraíso', color: '#d2b48c', roughness: 0.6 },
-  { id: 'petiribi', name: 'Petiribí', color: '#8b5a2b', roughness: 0.4 },
-  { id: 'nogal', name: 'Nogal', color: '#3d2b1f', roughness: 0.3 },
-  { id: 'roble', name: 'Roble', color: '#b58b5c', roughness: 0.5 },
+  { id: 'paraiso', name: 'Paraíso', color: '#e5c4a1', roughness: 0.6 },
+  { id: 'petiribi', name: 'Petiribí', color: '#b08d57', roughness: 0.4 },
+  { id: 'nogal', name: 'Nogal', color: '#5d4037', roughness: 0.35 },
+  { id: 'roble', name: 'Roble claro', color: '#dcc4a3', roughness: 0.5 },
 ];
 
 export default function ShowroomPage() {

@@ -89,6 +89,61 @@ const DynamicOrbitControls = ({
   );
 };
 
+// --- Utilidad para generar textura de madera ---
+const createWoodTexture = (baseColor: string) => {
+  if (typeof document === 'undefined') return null;
+  
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+
+  // Fondo base
+  ctx.fillStyle = baseColor;
+  ctx.fillRect(0, 0, 512, 512);
+
+  // Añadir vetas de madera
+  const colorObj = new THREE.Color(baseColor);
+  const darkerColor = `#${colorObj.clone().multiplyScalar(0.8).getHexString()}`;
+  const lighterColor = `#${colorObj.clone().multiplyScalar(1.2).getHexString()}`;
+
+  ctx.strokeStyle = darkerColor;
+  ctx.lineWidth = 2;
+
+  // Dibujar líneas irregulares para simular vetas
+  for (let i = 0; i < 100; i++) {
+    ctx.beginPath();
+    ctx.globalAlpha = Math.random() * 0.3;
+    let x = Math.random() * 512;
+    let y = 0;
+    ctx.moveTo(x, y);
+    
+    for (let j = 0; j < 10; j++) {
+      x += (Math.random() - 0.5) * 20;
+      y += 51.2;
+      ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  // Añadir nudos ocasionales
+  for (let i = 0; i < 3; i++) {
+    ctx.beginPath();
+    ctx.globalAlpha = Math.random() * 0.2;
+    const nx = Math.random() * 512;
+    const ny = Math.random() * 512;
+    ctx.ellipse(nx, ny, Math.random() * 40, Math.random() * 20, Math.random() * Math.PI, 0, Math.PI * 2);
+    ctx.fillStyle = darkerColor;
+    ctx.fill();
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(2, 2);
+  return texture;
+};
+
 // --- Componente de Modelo ---
 const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig, onLoaded }: { 
   url: string, 
@@ -108,6 +163,8 @@ const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig
   useEffect(() => {
     if (!woodConfig) return;
 
+    const woodTexture = createWoodTexture(woodConfig.color);
+
     scene.traverse((node) => {
       if ((node as THREE.Mesh).isMesh) {
         const mesh = node as THREE.Mesh;
@@ -119,20 +176,26 @@ const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig
                        name.includes('board') || 
                        name.includes('shelf') || 
                        name.includes('top') ||
-                       name.includes('madera');
+                       name.includes('madera') ||
+                       name.includes('mueble') ||
+                       name.includes('box');
 
         if (isWood) {
           mesh.material = new THREE.MeshStandardMaterial({
+            map: woodTexture,
             color: new THREE.Color(woodConfig.color),
             roughness: woodConfig.roughness,
-            metalness: 0.1,
-            envMapIntensity: 1
+            metalness: 0.05,
+            bumpMap: woodTexture,
+            bumpScale: 0.02,
+            envMapIntensity: 0.8
           });
-        } else if (name.includes('frame') || name.includes('metal') || name.includes('hierro') || name.includes('base')) {
+        } else if (name.includes('frame') || name.includes('metal') || name.includes('hierro') || name.includes('base') || name.includes('structure')) {
           mesh.material = new THREE.MeshStandardMaterial({
-            color: new THREE.Color('#121212'),
-            roughness: 0.4,
-            metalness: 0.8
+            color: new THREE.Color('#1a1a1a'),
+            roughness: 0.3,
+            metalness: 0.9,
+            envMapIntensity: 1.5
           });
         }
       }

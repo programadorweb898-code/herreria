@@ -40,6 +40,8 @@ export default function ShowroomPage() {
     wood: typeof WOOD_TYPES[0];
     cameraState?: CameraState;
   }>>({});
+  
+  const [viewerKey, setViewerKey] = useState<number>(0); // To force re-render of the viewer
 
   // 1. Cargar productos e inicializar configuraciones
   useEffect(() => {

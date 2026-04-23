@@ -106,7 +106,6 @@ const createWoodTexture = (baseColor: string) => {
   // Añadir vetas de madera
   const colorObj = new THREE.Color(baseColor);
   const darkerColor = `#${colorObj.clone().multiplyScalar(0.8).getHexString()}`;
-  const lighterColor = `#${colorObj.clone().multiplyScalar(1.2).getHexString()}`;
 
   ctx.strokeStyle = darkerColor;
   ctx.lineWidth = 2;

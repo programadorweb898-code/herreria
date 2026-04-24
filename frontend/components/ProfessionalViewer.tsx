@@ -165,36 +165,23 @@ const Model = ({ url, setMeshList, onMeshClick, onMeshesLoaded, width, height, d
     if (!woodConfig) return;
     const woodTexture = createWoodTexture(woodConfig.color);
     scene.traverse((node) => {
-      if ((node as THREE.Mesh).isMesh) {
-        const mesh = node as THREE.Mesh;
-        const name = mesh.name.toLowerCase();
-        const isMetal =
-          name.includes('frame') || name.includes('metal') ||
-          name.includes('hierro') || name.includes('base') ||
-          name.includes('structure') || name.includes('iron') ||
-          name.includes('pipe') || name.includes('tube') ||
-          name.includes('caño') || name.includes('leg') ||
-          name.includes('pata');
-        if (isMetal) return;
-        if (mesh.material instanceof THREE.MeshStandardMaterial) {
-          mesh.material.map = woodTexture;
-          mesh.material.color = new THREE.Color(woodConfig.color);
-          mesh.material.roughness = woodConfig.roughness;
-          mesh.material.needsUpdate = true;
-        } else {
-          mesh.material = new THREE.MeshStandardMaterial({
-            map: woodTexture,
-            color: new THREE.Color(woodConfig.color),
-            roughness: woodConfig.roughness,
-            metalness: 0.05,
-            bumpMap: woodTexture,
-            bumpScale: 0.02,
-            envMapIntensity: 0.8,
-          });
-        }
-      }
+      if (!(node as THREE.Mesh).isMesh) return;
+      const mesh = node as THREE.Mesh;
+      const name = mesh.name.toLowerCase();
+      const isWood = name.includes('wood') || name.includes('madera') || 
+                    name.includes('shelf') || name.includes('estante') || 
+                    name.includes('tabla') || name.includes('board') ||
+                    name.includes('top');
+      
+      if (!isWood) return;
+      
+      const mat = mesh.material as THREE.MeshStandardMaterial;
+      mat.map = woodTexture;
+      mat.color = new THREE.Color(woodConfig.color);
+      mat.roughness = woodConfig.roughness;
+      mat.needsUpdate = true;
     });
-  }, [scene, woodConfig, woodConfig?.color, woodConfig?.roughness]);
+  }, [scene, woodConfig, woodConfig.color, woodConfig.roughness]);
 
   useEffect(() => {
     const meshes: MeshNode[] = [];

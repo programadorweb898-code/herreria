@@ -192,7 +192,7 @@ const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig
         }
       }
     });
-  }, [scene, woodConfig, woodConfig.color, woodConfig.roughness]);
+  }, [scene, woodConfig, woodConfig?.color, woodConfig?.roughness]);
 
   useEffect(() => {
     const meshes: MeshNode[] = [];

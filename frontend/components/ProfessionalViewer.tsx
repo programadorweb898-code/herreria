@@ -164,18 +164,31 @@ const Model = ({ url, setMeshList, onMeshClick, onMeshesLoaded, width, height, d
   useEffect(() => {
     if (!woodConfig) return;
     const woodTexture = createWoodTexture(woodConfig.color);
+
     scene.traverse((node) => {
       if (!(node as THREE.Mesh).isMesh) return;
       const mesh = node as THREE.Mesh;
-      const name = mesh.name.toLowerCase();
-      const isWood = name.includes('wood') || name.includes('madera') || 
-                    name.includes('shelf') || name.includes('estante') || 
-                    name.includes('tabla') || name.includes('board') ||
-                    name.includes('top');
-      
+      if (!mesh.material) return;
+
+      const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+      if (!(mat instanceof THREE.MeshStandardMaterial)) return;
+
+      const hsl = { h: 0, s: 0, l: 0 };
+      mat.color.getHSL(hsl);
+
+      const hueDeg = hsl.h * 360;
+      const saturation = hsl.s;
+      const lightness = hsl.l;
+
+      const isMetal = saturation < 0.15 || lightness < 0.12;
+      const isWood =
+        !isMetal &&
+        hueDeg >= 10 && hueDeg <= 55 &&
+        saturation >= 0.15 &&
+        lightness >= 0.1 && lightness <= 0.75;
+
       if (!isWood) return;
-      
-      const mat = mesh.material as THREE.MeshStandardMaterial;
+
       mat.map = woodTexture;
       mat.color = new THREE.Color(woodConfig.color);
       mat.roughness = woodConfig.roughness;

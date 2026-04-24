@@ -161,56 +161,38 @@ const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig
   // Aplicar material de madera
   useEffect(() => {
     if (!woodConfig) return;
-
     const woodTexture = createWoodTexture(woodConfig.color);
-
     scene.traverse((node) => {
       if ((node as THREE.Mesh).isMesh) {
         const mesh = node as THREE.Mesh;
         const name = mesh.name.toLowerCase();
-        
-        const isWood = name.includes('wood') || 
-                       name.includes('tablero') || 
-                       name.includes('estante') || 
-                       name.includes('board') || 
-                       name.includes('shelf') || 
-                       name.includes('top') ||
-                       name.includes('madera') ||
-                       name.includes('mueble') ||
-                       name.includes('box');
-
-        if (isWood) {
-          // Si el material ya existe, actualizamos sus propiedades
-          if (mesh.material instanceof THREE.MeshStandardMaterial) {
-            mesh.material.map = woodTexture;
-            mesh.material.color = new THREE.Color(woodConfig.color);
-            mesh.material.roughness = woodConfig.roughness;
-            mesh.material.needsUpdate = true; // Marcar para que Three.js actualice el material
-          } else {
-            // Si no, creamos uno nuevo
-            mesh.material = new THREE.MeshStandardMaterial({
-              map: woodTexture,
-              color: new THREE.Color(woodConfig.color),
-              roughness: woodConfig.roughness,
-              metalness: 0.05,
-              bumpMap: woodTexture,
-              bumpScale: 0.02,
-              envMapIntensity: 0.8
-            });
-          }
-        } else if (name.includes('frame') || name.includes('metal') || name.includes('hierro') || name.includes('base') || name.includes('structure')) {
+        const isMetal =
+          name.includes('frame') || name.includes('metal') ||
+          name.includes('hierro') || name.includes('base') ||
+          name.includes('structure') || name.includes('iron') ||
+          name.includes('pipe') || name.includes('tube') ||
+          name.includes('caño') || name.includes('leg') ||
+          name.includes('pata');
+        if (isMetal) return;
+        if (mesh.material instanceof THREE.MeshStandardMaterial) {
+          mesh.material.map = woodTexture;
+          mesh.material.color = new THREE.Color(woodConfig.color);
+          mesh.material.roughness = woodConfig.roughness;
+          mesh.material.needsUpdate = true;
+        } else {
           mesh.material = new THREE.MeshStandardMaterial({
-            color: new THREE.Color('#1a1a1a'),
-            roughness: 0.3,
-            metalness: 0.9,
-            envMapIntensity: 1.5
+            map: woodTexture,
+            color: new THREE.Color(woodConfig.color),
+            roughness: woodConfig.roughness,
+            metalness: 0.05,
+            bumpMap: woodTexture,
+            bumpScale: 0.02,
+            envMapIntensity: 0.8,
           });
         }
       }
     });
-  // Añadimos woodConfig.color y woodConfig.roughness a las dependencias para asegurar que el efecto se ejecute
-  // cuando cambien los valores específicos de color o rugosidad.
-  }, [scene, woodConfig, woodConfig?.color, woodConfig?.roughness]);
+  }, [scene, woodConfig, woodConfig.color, woodConfig.roughness]);
 
   useEffect(() => {
     const meshes: MeshNode[] = [];

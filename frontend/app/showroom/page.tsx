@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import SliderControl from "@/components/SliderControl";
 import dynamic from "next/dynamic";
 import Image from "next/image";

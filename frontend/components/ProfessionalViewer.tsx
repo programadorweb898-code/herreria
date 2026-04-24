@@ -181,7 +181,7 @@ const Model = ({ url, setMeshList, onMeshClick, onMeshesLoaded, width, height, d
       mat.roughness = woodConfig.roughness;
       mat.needsUpdate = true;
     });
-  }, [scene, woodConfig, woodConfig.color, woodConfig.roughness]);
+  }, [scene, woodConfig, woodConfig?.color, woodConfig?.roughness]);
 
   useEffect(() => {
     const meshes: MeshNode[] = [];

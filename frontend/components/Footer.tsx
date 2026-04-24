@@ -39,14 +39,14 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer id="footer" className="border-t border-border bg-[#f3f3f1]">
+    <footer id="footer" className="border-t border-white/5 bg-neutral-950">
       <div className="mx-auto max-w-[1440px] px-6 py-12 sm:px-8 lg:px-12">
-        <div className="flex flex-col gap-10 border-b border-border pb-10 md:flex-row md:items-start md:justify-between">
+        <div className="flex flex-col gap-10 border-b border-white/5 pb-10 md:flex-row md:items-start md:justify-between">
           <div className="space-y-4">
-            <Link className="inline-block text-[11px] font-semibold uppercase tracking-[0.32em]" href="/">
+            <Link className="inline-block text-[11px] font-semibold uppercase tracking-[0.32em] text-white transition hover:text-emerald-400" href="/">
               Herrería Estudio
             </Link>
-            <p className="max-w-xs text-[11px] font-light uppercase leading-6 tracking-[0.22em] text-slate-500">
+            <p className="max-w-xs text-[11px] font-light uppercase leading-6 tracking-[0.22em] text-neutral-500">
               Precisión material.
               <br />
               Objetos metálicos atemporales.
@@ -55,12 +55,12 @@ export default function Footer() {
 
           <div className="flex flex-col gap-8 sm:flex-row sm:gap-16">
             <div className="space-y-4">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-foreground">
+              <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-emerald-400">
                 Navegación
               </p>
-              <nav className="flex flex-col gap-3 text-[11px] font-light uppercase tracking-[0.2em] text-slate-500">
+              <nav className="flex flex-col gap-3 text-[11px] font-light uppercase tracking-[0.2em] text-neutral-400">
                 {links.map((link) => (
-                  <Link className="transition hover:text-foreground" href={link.href} key={link.href}>
+                  <Link className="transition hover:text-emerald-400" href={link.href} key={link.href}>
                     {link.label}
                   </Link>
                 ))}
@@ -68,7 +68,7 @@ export default function Footer() {
             </div>
 
             <div className="space-y-4">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-foreground">
+              <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-emerald-400">
                 Contacto
               </p>
               <div className="flex flex-col gap-3">
@@ -78,7 +78,7 @@ export default function Footer() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-slate-500 transition hover:text-foreground"
+                    className="flex items-center gap-2 text-neutral-400 transition hover:text-emerald-400"
                     title={social.label}
                   >
                     {social.icon}
@@ -93,10 +93,10 @@ export default function Footer() {
             </div>
 
             <div className="space-y-4">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-foreground">
+              <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-emerald-400">
                 Estudio
               </p>
-              <div className="flex flex-col gap-3 text-[11px] font-light uppercase tracking-[0.2em] text-slate-500">
+              <div className="flex flex-col gap-3 text-[11px] font-light uppercase tracking-[0.2em] text-neutral-400">
                 <span>Buenos Aires</span>
                 <span>Lunes a viernes</span>
                 <span>09:00 - 18:00</span>
@@ -105,7 +105,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 pt-6 text-[10px] font-light uppercase tracking-[0.22em] text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 pt-6 text-[10px] font-light uppercase tracking-[0.22em] text-neutral-600 sm:flex-row sm:items-center sm:justify-between">
           <span>© 2026 Herrería Estudio. Hierro arquitectónico.</span>
           <span>Diseño a medida y series limitadas.</span>
         </div>

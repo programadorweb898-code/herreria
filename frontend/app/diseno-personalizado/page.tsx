@@ -196,17 +196,17 @@ export default function DisenoPersonalizadoPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 pb-20 pt-20 sm:px-6 md:pt-24 lg:px-8">
       <div className="mb-8 flex flex-col items-center text-center">
-        <p className="mb-4 text-xs font-light uppercase tracking-[0.4em] text-accent">
+        <p className="mb-4 text-xs font-light uppercase tracking-[0.4em] text-emerald-400">
           Experiencia Interactiva
         </p>
-        <h1 className="text-4xl font-semibold uppercase tracking-tight sm:text-5xl md:text-6xl">
+        <h1 className="text-4xl font-semibold uppercase tracking-tight sm:text-5xl md:text-6xl text-white">
           Diseño Personalizado
         </h1>
-        <div className="mt-6 h-px w-24 bg-foreground/20" />
+        <div className="mt-6 h-px w-24 bg-emerald-500/20" />
       </div>
 
-      <section className="mb-10 grid gap-px border border-border bg-border md:grid-cols-[1.2fr_0.8fr] lg:grid-cols-[1.4fr_1fr] overflow-hidden">
-        <div className="bg-white p-4 sm:p-6 md:p-8 flex flex-col gap-6 overflow-hidden">
+      <section className="mb-10 grid gap-px border border-white/5 bg-white/5 md:grid-cols-[1.2fr_0.8fr] lg:grid-cols-[1.4fr_1fr] overflow-hidden">
+        <div className="bg-neutral-900 p-4 sm:p-6 md:p-8 flex flex-col gap-6 overflow-hidden">
           <div className="relative group w-full">
             <EstanteViewer 
               width={width / 100} 
@@ -216,7 +216,7 @@ export default function DisenoPersonalizadoPage() {
               productSlug={product?.slug}
             />
             {product?.image && (
-              <div className="absolute top-4 right-4 w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 border-2 border-white shadow-xl overflow-hidden z-10 transition-transform hover:scale-105">
+              <div className="absolute top-4 right-4 w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 border-2 border-white/10 shadow-2xl overflow-hidden z-10 transition-transform hover:scale-105">
                 <Image 
                   src={product.image} 
                   alt={product.name} 
@@ -231,8 +231,8 @@ export default function DisenoPersonalizadoPage() {
           </div>
 
           {/* Selector de productos */}
-          <div className="space-y-4 border-t border-slate-100 pt-6">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-accent">Cambiar producto 3D</p>
+          <div className="space-y-4 border-t border-white/5 pt-6">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-emerald-400">Cambiar producto 3D</p>
             <div className="flex gap-3 overflow-x-auto pb-4 custom-scrollbar">
               {allProducts.map((p) => (
                 <button
@@ -240,7 +240,7 @@ export default function DisenoPersonalizadoPage() {
                   onClick={() => handleProductChange(p)}
                   className={`relative flex-shrink-0 w-20 h-20 border-2 transition-all duration-300 ${
                     product?.slug === p.slug 
-                      ? "border-foreground scale-105 shadow-lg z-10" 
+                      ? "border-emerald-500 scale-105 shadow-lg z-10" 
                       : "border-transparent opacity-50 hover:opacity-100 hover:scale-105"
                   }`}
                 >
@@ -250,32 +250,29 @@ export default function DisenoPersonalizadoPage() {
                     fill 
                     className="object-cover"
                   />
-                  {product?.slug !== p.slug && (
-                    <div className="absolute inset-0 bg-white/10" />
-                  )}
                 </button>
               ))}
             </div>
           </div>
 
           {product && (
-            <div className="bg-slate-50 p-4 border-l-4 border-foreground">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-accent mb-1">Modelo Seleccionado</p>
-              <p className="text-sm font-medium">{product.name}</p>
+            <div className="bg-neutral-800 p-4 border-l-4 border-emerald-500">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-emerald-400 mb-1">Modelo Seleccionado</p>
+              <p className="text-sm font-medium text-white">{product.name}</p>
             </div>
           )}
         </div>
 
-        <div className="bg-white p-4 sm:p-6 md:p-8 flex flex-col">
+        <div className="bg-neutral-900 p-4 sm:p-6 md:p-8 flex flex-col border-l border-white/5">
           <div className="h-[350px] sm:h-[400px] md:h-[500px] overflow-y-auto custom-scrollbar pr-2 flex flex-col gap-8">
             <div className="space-y-3">
-              <p className="text-xs font-light uppercase tracking-[0.28em] text-accent">
+              <p className="text-xs font-light uppercase tracking-[0.28em] text-emerald-400">
                 Visor interactivo
               </p>
-              <h2 className="text-2xl md:text-3xl font-semibold uppercase tracking-tight">
+              <h2 className="text-2xl md:text-3xl font-semibold uppercase tracking-tight text-white">
                 Ajustá el estante en tiempo real.
               </h2>
-              <p className="text-sm font-light leading-7 text-slate-600">
+              <p className="text-sm font-light leading-7 text-neutral-400">
                 Explorá proporciones antes de pedir tu pieza y usá estos valores como referencia para
                 tu diseño personalizado.
               </p>
@@ -331,7 +328,7 @@ export default function DisenoPersonalizadoPage() {
                     label="Profundidad"
                     value={depth}
                     min={10}
-                    max={100}
+                    max={200}
                     step={1}
                     onChange={setDepth}
                   />
@@ -339,7 +336,7 @@ export default function DisenoPersonalizadoPage() {
                     label=""
                     value={depth}
                     min={10}
-                    max={100}
+                    max={200}
                     step={1}
                     onChange={setDepth}
                   />
@@ -347,42 +344,42 @@ export default function DisenoPersonalizadoPage() {
               )}
             </div>
           </div>
-          <div className="flex-1 bg-white" />
+          <div className="flex-1 bg-neutral-900" />
         </div>
       </section>
 
-      <div className="flex flex-col items-center gap-8 border border-border px-8 py-16 text-center sm:px-12 sm:py-20">
-        <p className="text-xs font-light uppercase tracking-[0.28em] text-accent">Diseño personalizado</p>
-        <h1 className="max-w-3xl text-4xl font-semibold uppercase tracking-tight sm:text-5xl">
+      <div className="flex flex-col items-center gap-8 border border-white/5 bg-neutral-900 px-8 py-16 text-center sm:px-12 sm:py-20">
+        <p className="text-xs font-light uppercase tracking-[0.28em] text-emerald-400">Diseño personalizado</p>
+        <h1 className="max-w-3xl text-4xl font-semibold uppercase tracking-tight sm:text-5xl text-white">
           Crea tu pieza única a medida.
         </h1>
 
-        <WhatsAppButton className="px-8 py-4" message={message} phone={phone}>
+        <WhatsAppButton className="px-8 py-4 bg-emerald-500 text-black font-bold hover:bg-emerald-600 transition-colors" message={message} phone={phone}>
           Solicitar diseño
         </WhatsAppButton>
 
-        <p className="max-w-2xl mt-8 text-base font-light leading-8 text-slate-600">
+        <p className="max-w-2xl mt-8 text-base font-light leading-8 text-neutral-400">
           Trabajamos con vos para diseñar y fabricar muebles y objetos metálicos que se adapten
           perfectamente a tus necesidades y espacios. Desde materiales hasta dimensiones y acabados.
         </p>
       </div>
 
-      <div className="mt-10 grid gap-px border border-border bg-border md:grid-cols-3">
-        <div className="bg-white p-8">
-          <p className="mb-2 text-xs font-light uppercase tracking-[0.22em] text-accent">Proceso</p>
-          <p className="text-base font-light leading-8 text-slate-600">
+      <div className="mt-10 grid gap-px border border-white/5 bg-white/5 md:grid-cols-3">
+        <div className="bg-neutral-900 p-8">
+          <p className="mb-2 text-xs font-light uppercase tracking-[0.22em] text-emerald-400">Proceso</p>
+          <p className="text-base font-light leading-8 text-neutral-400">
             De lo conceptual a lo real. Asesoramiento completo desde la idea hasta la entrega final.
           </p>
         </div>
-        <div className="bg-white p-8">
-          <p className="mb-2 text-xs font-light uppercase tracking-[0.22em] text-accent">Materiales</p>
-          <p className="text-base font-light leading-8 text-slate-600">
+        <div className="bg-neutral-900 p-8 border-x border-white/5">
+          <p className="mb-2 text-xs font-light uppercase tracking-[0.22em] text-emerald-400">Materiales</p>
+          <p className="text-base font-light leading-8 text-neutral-400">
             Hierro, acero, madera y acabados a tu elección. Calidad y precisión garantizadas.
           </p>
         </div>
-        <div className="bg-white p-8">
-          <p className="mb-2 text-xs font-light uppercase tracking-[0.22em] text-accent">Tiempos</p>
-          <p className="text-base font-light leading-8 text-slate-600">
+        <div className="bg-neutral-900 p-8">
+          <p className="mb-2 text-xs font-light uppercase tracking-[0.22em] text-emerald-400">Tiempos</p>
+          <p className="text-base font-light leading-8 text-neutral-400">
             Cotización según proyecto. Fabricación y entrega con cronograma acordado.
           </p>
         </div>

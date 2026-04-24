@@ -23,10 +23,10 @@ function SliderControl({ label, value, min, max, onChange }: { label: string; va
 }
 
 const WOOD_TYPES = [
-  { id: 'paraiso', name: 'Paraíso', color: '#e5c4a1', roughness: 0.6 },
-  { id: 'petiribi', name: 'Petiribí', color: '#b08d57', roughness: 0.4 },
-  { id: 'nogal', name: 'Nogal', color: '#5d4037', roughness: 0.35 },
-  { id: 'roble', name: 'Roble claro', color: '#dcc4a3', roughness: 0.5 },
+  { id: 'paraiso', name: 'Paraíso', color: '#e5c4a1', roughness: 0.6, multiplier: 1.0 },
+  { id: 'petiribi', name: 'Petiribí', color: '#b08d57', roughness: 0.4, multiplier: 1.3 },
+  { id: 'nogal', name: 'Nogal', color: '#5d4037', roughness: 0.35, multiplier: 1.5 },
+  { id: 'roble', name: 'Roble claro', color: '#dcc4a3', roughness: 0.5, multiplier: 1.2 },
 ];
 
 export default function ShowroomPage() {
@@ -42,7 +42,34 @@ export default function ShowroomPage() {
     cameraState?: CameraState;
   }>>({});
   
-  const [viewerKey, setViewerKey] = useState<number>(0); // To force re-render of the viewer
+  const [viewerKey, setViewerKey] = useState<number>(0); 
+
+  // Cálculo de precio dinámico
+  const calculatePrice = () => {
+    if (!selectedProduct || !productConfigs[selectedProduct._id]) return 0;
+    const config = productConfigs[selectedProduct._id];
+    
+    // Dimensiones base del producto (o defaults si no tiene)
+    const baseW = selectedProduct.width || 100;
+    const baseH = selectedProduct.height || 180;
+    const baseD = selectedProduct.depth || 30;
+    const basePrice = selectedProduct.price || 0;
+
+    // Calculamos el factor de escala volumétrico
+    const scaleFactor = (config.width * config.height * config.depth) / (baseW * baseH * baseD);
+    
+    // Aplicamos el multiplicador de madera
+    const woodMultiplier = config.wood.multiplier;
+
+    return Math.round(basePrice * scaleFactor * woodMultiplier);
+  };
+
+  const currentPrice = calculatePrice();
+  const formattedPrice = new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+    maximumFractionDigits: 0
+  }).format(currentPrice);
 
   // 1. Cargar productos e inicializar configuraciones
   useEffect(() => {
@@ -151,15 +178,24 @@ export default function ShowroomPage() {
 
     {/* Controles móviles */}
     <div className="lg:hidden space-y-4">
-      <div className="bg-neutral-900 p-4 rounded-2xl border border-white/5 grid grid-cols-3 gap-4">
-        <div className="col-span-1">
-           <SliderControl label="Ancho" value={currentConfig.width} min={10} max={250} onChange={(v) => updateConfig({ width: v })} />
+      <div className="bg-neutral-900 p-6 rounded-2xl border border-white/5 space-y-4">
+        <div className="flex justify-between items-end">
+          <div className="space-y-1">
+            <h3 className="font-bold text-emerald-400 uppercase tracking-widest text-[10px]">Precio Estimado</h3>
+            <p className="text-2xl font-semibold tabular-nums text-white">{formattedPrice}</p>
+          </div>
+          <p className="text-[8px] text-neutral-500 uppercase tracking-tighter mb-1 text-right">Sujeto a cambios según materiales</p>
         </div>
-        <div className="col-span-1">
-           <SliderControl label="Alto" value={currentConfig.height} min={10} max={250} onChange={(v) => updateConfig({ height: v })} />
-        </div>
-        <div className="col-span-1">
-           <SliderControl label="Prof" value={currentConfig.depth} min={10} max={100} onChange={(v) => updateConfig({ depth: v })} />
+        <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/5">
+          <div className="col-span-1">
+             <SliderControl label="Ancho" value={currentConfig.width} min={10} max={250} onChange={(v) => updateConfig({ width: v })} />
+          </div>
+          <div className="col-span-1">
+             <SliderControl label="Alto" value={currentConfig.height} min={10} max={250} onChange={(v) => updateConfig({ height: v })} />
+          </div>
+          <div className="col-span-1">
+             <SliderControl label="Prof" value={currentConfig.depth} min={10} max={200} onChange={(v) => updateConfig({ depth: v })} />
+          </div>
         </div>
       </div>
 
@@ -185,10 +221,18 @@ export default function ShowroomPage() {
 
           <aside className="hidden lg:block space-y-6">
             <div className="bg-neutral-900 p-6 rounded-2xl border border-white/5 space-y-8">
-              <h3 className="font-bold text-emerald-400 uppercase tracking-widest text-sm">Ajustar Medidas</h3>
-              <SliderControl label="Ancho" value={currentConfig.width} min={10} max={250} onChange={(v) => updateConfig({ width: v })} />
-              <SliderControl label="Alto" value={currentConfig.height} min={10} max={250} onChange={(v) => updateConfig({ height: v })} />
-              <SliderControl label="Profundidad" value={currentConfig.depth} min={10} max={100} onChange={(v) => updateConfig({ depth: v })} />
+              <div className="space-y-1">
+                <h3 className="font-bold text-emerald-400 uppercase tracking-widest text-[10px]">Precio Estimado</h3>
+                <p className="text-3xl font-semibold tabular-nums text-white">{formattedPrice}</p>
+                <p className="text-[10px] text-neutral-500 uppercase tracking-tighter">Sujeto a cambios según materiales</p>
+              </div>
+
+              <div className="pt-6 border-t border-white/5 space-y-6">
+                <h3 className="font-bold text-emerald-400 uppercase tracking-widest text-sm">Ajustar Medidas</h3>
+                <SliderControl label="Ancho" value={currentConfig.width} min={10} max={250} onChange={(v) => updateConfig({ width: v })} />
+                <SliderControl label="Alto" value={currentConfig.height} min={10} max={250} onChange={(v) => updateConfig({ height: v })} />
+                <SliderControl label="Profundidad" value={currentConfig.depth} min={10} max={200} onChange={(v) => updateConfig({ depth: v })} />
+              </div>
               
               {selectedProduct.hasWood && (
                 <div className="pt-6 border-t border-white/5 space-y-4">
@@ -217,12 +261,8 @@ export default function ShowroomPage() {
         </section>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-20">
-        {/* ... contenido existente ... */}
-      </div>
-
       {/* Bloque CTA */}
-      <section className="border-t border-white/5 py-20">
+      <section className="border-t border-white/5 py-10">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-xs font-light uppercase tracking-[0.28em] text-emerald-400 mb-4">Diseño personalizado</p>
           <h2 className="text-3xl md:text-5xl font-bold mb-8">¿Querés tu pieza única a medida?</h2>

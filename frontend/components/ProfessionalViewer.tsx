@@ -170,24 +170,10 @@ const Model = ({ url, setMeshList, onMeshClick, onMeshesLoaded, width, height, d
       const mesh = node as THREE.Mesh;
       if (!mesh.material) return;
 
-      const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+      const mat = Array.isArray(mesh.material)
+        ? mesh.material[0]
+        : mesh.material;
       if (!(mat instanceof THREE.MeshStandardMaterial)) return;
-
-      const hsl = { h: 0, s: 0, l: 0 };
-      mat.color.getHSL(hsl);
-
-      const hueDeg = hsl.h * 360;
-      const saturation = hsl.s;
-      const lightness = hsl.l;
-
-      const isMetal = saturation < 0.15 || lightness < 0.12;
-      const isWood =
-        !isMetal &&
-        hueDeg >= 10 && hueDeg <= 55 &&
-        saturation >= 0.15 &&
-        lightness >= 0.1 && lightness <= 0.75;
-
-      if (!isWood) return;
 
       mat.map = woodTexture;
       mat.color = new THREE.Color(woodConfig.color);

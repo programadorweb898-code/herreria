@@ -163,21 +163,23 @@ export default function ShowroomPage() {
         </div>
       </div>
 
-      <div className="bg-neutral-900 p-4 rounded-2xl border border-white/5">
-        <h3 className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.2em] mb-3">Tipo de Madera</h3>
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-          {WOOD_TYPES.map((wood) => (
-            <button
-              key={wood.id}
-              onClick={() => updateConfig({ wood })}
-              className={`flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${currentConfig.wood.id === wood.id ? 'border-emerald-500 bg-emerald-500/10' : 'border-white/5 bg-neutral-950/50'}`}
-            >
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: wood.color }} />
-              <span className="text-[10px] font-bold uppercase tracking-tight text-neutral-300">{wood.name}</span>
-            </button>
-          ))}
+      {selectedProduct.hasWood && (
+        <div className="bg-neutral-900 p-4 rounded-2xl border border-white/5">
+          <h3 className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.2em] mb-3">Tipo de Madera</h3>
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            {WOOD_TYPES.map((wood) => (
+              <button
+                key={wood.id}
+                onClick={() => updateConfig({ wood })}
+                className={`flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${currentConfig.wood.id === wood.id ? 'border-emerald-500 bg-emerald-500/10' : 'border-white/5 bg-neutral-950/50'}`}
+              >
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: wood.color }} />
+                <span className="text-[10px] font-bold uppercase tracking-tight text-neutral-300">{wood.name}</span>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   </div>
 
@@ -188,21 +190,23 @@ export default function ShowroomPage() {
               <SliderControl label="Alto" value={currentConfig.height} min={10} max={250} onChange={(v) => updateConfig({ height: v })} />
               <SliderControl label="Profundidad" value={currentConfig.depth} min={10} max={100} onChange={(v) => updateConfig({ depth: v })} />
               
-              <div className="pt-6 border-t border-white/5 space-y-4">
-                <h3 className="font-bold text-emerald-400 uppercase tracking-widest text-sm">Tipo de Madera</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {WOOD_TYPES.map((wood) => (
-                    <button
-                      key={wood.id}
-                      onClick={() => updateConfig({ wood })}
-                      className={`flex items-center gap-2 p-2 rounded-lg border transition-all ${currentConfig.wood.id === wood.id ? 'border-emerald-500 bg-emerald-500/10' : 'border-white/5 hover:border-white/20'}`}
-                    >
-                      <div className="w-4 h-4 rounded-full" style={{ backgroundColor: wood.color }} />
-                      <span className="text-xs uppercase tracking-tighter">{wood.name}</span>
-                    </button>
-                  ))}
+              {selectedProduct.hasWood && (
+                <div className="pt-6 border-t border-white/5 space-y-4">
+                  <h3 className="font-bold text-emerald-400 uppercase tracking-widest text-sm">Tipo de Madera</h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    {WOOD_TYPES.map((wood) => (
+                      <button
+                        key={wood.id}
+                        onClick={() => updateConfig({ wood })}
+                        className={`flex items-center gap-2 p-2 rounded-lg border transition-all ${currentConfig.wood.id === wood.id ? 'border-emerald-500 bg-emerald-500/10' : 'border-white/5 hover:border-white/20'}`}
+                      >
+                        <div className="w-4 h-4 rounded-full" style={{ backgroundColor: wood.color }} />
+                        <span className="text-xs uppercase tracking-tighter">{wood.name}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="pt-6 border-t border-white/5 space-y-2">
                  <p className="text-neutral-500 text-xs">Producto: {selectedProduct.name}</p>

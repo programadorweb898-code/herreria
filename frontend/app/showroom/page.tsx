@@ -32,6 +32,7 @@ const WOOD_TYPES = [
 export default function ShowroomPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [meshNames, setMeshNames] = useState<string[]>([]);
   
   const [productConfigs, setProductConfigs] = useState<Record<string, {
     width: number;
@@ -126,6 +127,7 @@ export default function ShowroomPage() {
         cameraState={currentConfig.cameraState}
         onCameraChange={(state: CameraState) => updateConfig({ cameraState: state })}
         onReset={handleReset}
+        onMeshesLoaded={setMeshNames}
       />
     </div>
 
@@ -244,6 +246,15 @@ export default function ShowroomPage() {
           <p className="text-sm text-neutral-400 leading-7">Cotización según proyecto. Fabricación y entrega con cronograma acordado.</p>
         </div>
       </section>
+
+      {meshNames.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 bg-black/90 text-white text-xs p-4 z-50 max-h-56 overflow-y-auto border-t border-white/20">
+          <p className="font-bold text-emerald-400 mb-2 uppercase tracking-widest">Meshes ({meshNames.length})</p>
+          {meshNames.map((n, i) => (
+            <div key={i} className="py-0.5 border-b border-white/10">{i + 1}. {n}</div>
+          ))}
+        </div>
+      )}
 
     </main>
   );

@@ -27,6 +27,7 @@ interface MeshNode {
 interface ProfessionalViewerProps {
   modelUrl: string;
   onMeshClick?: (meshName: string) => void;
+  onMeshesLoaded?: (names: string[]) => void;
   width?: number;
   height?: number;
   depth?: number;
@@ -144,10 +145,11 @@ const createWoodTexture = (baseColor: string) => {
 };
 
 // --- Componente de Modelo ---
-const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig, onLoaded }: { 
+const Model = ({ url, setMeshList, onMeshClick, onMeshesLoaded, width, height, depth, woodConfig, onLoaded }: { 
   url: string, 
   setMeshList: (list: MeshNode[]) => void,
   onMeshClick?: (name: string) => void,
+  onMeshesLoaded?: (names: string[]) => void,
   width?: number,
   height?: number,
   depth?: number,
@@ -207,6 +209,16 @@ const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig
     });
     setMeshList(meshes);
 
+    if (onMeshesLoaded) {
+      const names: string[] = [];
+      scene.traverse((node) => {
+        if ((node as THREE.Mesh).isMesh) {
+          names.push(node.name || "(sin nombre)");
+        }
+      });
+      onMeshesLoaded(names);
+    }
+
     const box = new THREE.Box3().setFromObject(scene);
     const center = new THREE.Vector3();
     box.getCenter(center);
@@ -254,7 +266,7 @@ const Model = ({ url, setMeshList, onMeshClick, width, height, depth, woodConfig
 };
 
 // --- Visor Principal ---
-export default function ProfessionalViewer({ modelUrl, onMeshClick, width, height, depth, woodConfig, onReset, cameraState, onCameraChange }: ProfessionalViewerProps) {
+export default function ProfessionalViewer({ modelUrl, onMeshClick, onMeshesLoaded, width, height, depth, woodConfig, onReset, cameraState, onCameraChange }: ProfessionalViewerProps) {
   const [shouldAdjust, setShouldAdjust] = useState(true);
   const controlsRef = useRef<OrbitControlsImpl>(null);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -325,6 +337,7 @@ export default function ProfessionalViewer({ modelUrl, onMeshClick, width, heigh
                 url={modelUrl} 
                 setMeshList={setMeshList}
                 onMeshClick={onMeshClick}
+                onMeshesLoaded={onMeshesLoaded}
                 width={width}
                 height={height}
                 depth={depth}

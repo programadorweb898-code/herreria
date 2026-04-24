@@ -3,8 +3,7 @@ import Link from "next/link";
 const links = [
   { href: "/productos", label: "Nuestros trabajos" },
   { href: "/nosotros", label: "Quiénes somos" },
-  { href: "/diseno-personalizado", label: "Diseño personalizado" },
-  { href: "/showroom", label: "Showroom" },
+  { href: "/showroom", label: "Diseño personalizado" },
 ];
 
 const socialLinks = [

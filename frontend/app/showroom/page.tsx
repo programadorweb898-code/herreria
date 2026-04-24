@@ -1,35 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense } from 'react';
+import SliderControl from "@/components/SliderControl";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { getProducts } from "@/data/products";
 import type { Product } from "@/types/product";
 import type { CameraState } from "@/components/ProfessionalViewer";
 
 const ProfessionalViewer = dynamic(() => import("@/components/ProfessionalViewer"), { ssr: false });
 
-
-function SliderControl({ label, value, min, max, onChange }: { label: string; value: number; min: number; max: number; onChange: (v: number) => void }) {
-  return (
-    <label className="block space-y-2">
-      <div className="flex justify-between text-xs text-neutral-400 uppercase tracking-widest">
-        <span>{label}</span>
-        <span>{value} cm</span>
-      </div>
-      <input type="range" min={min} max={max} value={value} onChange={(e) => onChange(Number(e.target.value))} className="w-full h-1 bg-neutral-800 accent-emerald-500 appearance-none cursor-pointer" />
-    </label>
-  );
-}
-
-const WOOD_TYPES = [
-  { id: 'paraiso', name: 'Paraíso', color: '#e5c4a1', roughness: 0.6, multiplier: 1.0 },
-  { id: 'petiribi', name: 'Petiribí', color: '#b08d57', roughness: 0.4, multiplier: 1.3 },
-  { id: 'nogal', name: 'Nogal', color: '#5d4037', roughness: 0.35, multiplier: 1.5 },
-  { id: 'roble', name: 'Roble claro', color: '#dcc4a3', roughness: 0.5, multiplier: 1.2 },
-];
-
-export default function ShowroomPage() {
+function ShowroomContent() {
+  const searchParams = useSearchParams();
+  const productSlug = searchParams.get("product");
+  
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [meshNames, setMeshNames] = useState<string[]>([]);
@@ -58,8 +44,8 @@ export default function ShowroomPage() {
     // Calculamos el factor de escala volumétrico
     const scaleFactor = (config.width * config.height * config.depth) / (baseW * baseH * baseD);
     
-    // Aplicamos el multiplicador de madera
-    const woodMultiplier = config.wood.multiplier;
+    // Aplicamos el multiplicador de madera (con fallback de 1.0 por seguridad)
+    const woodMultiplier = config.wood?.multiplier || 1.0;
 
     return Math.round(basePrice * scaleFactor * woodMultiplier);
   };
@@ -77,7 +63,10 @@ export default function ShowroomPage() {
       const data = await getProducts();
       setProducts(data);
       if (data.length > 0) {
-        setSelectedProduct(data[0]);
+        // Seleccionar producto por slug o el primero
+        const productFromUrl = productSlug ? data.find(p => p.slug === productSlug) : null;
+        const initialProduct = productFromUrl || data[0];
+        setSelectedProduct(initialProduct);
         
         // Intentar cargar desde LocalStorage
         const saved = localStorage.getItem('showroom_configs');
@@ -85,15 +74,30 @@ export default function ShowroomPage() {
 
         const initialConfigs: typeof productConfigs = {};
         data.forEach(p => {
-          // Prioridad: 1. Lo guardado en LocalStorage, 2. Los defaults del producto
-          // Caso especial: Bodega Milán en showroom por defecto 35cm
+          const savedConfig = savedConfigs[p._id];
+          
+          // Asegurarnos de que el objeto de madera tenga todas las propiedades actuales (como multiplier)
+          let currentWood = WOOD_TYPES[0];
+          if (savedConfig?.wood?.id) {
+            const found = WOOD_TYPES.find(w => w.id === savedConfig.wood.id);
+            if (found) currentWood = found;
+          }
+
+          // Si es el producto de la URL, tomar dimensiones de URL si existen
+          const isSelectedFromUrl = productFromUrl && p.slug === productSlug;
+          
+          const urlWidth = isSelectedFromUrl ? Number(searchParams.get("width")) : null;
+          const urlHeight = isSelectedFromUrl ? Number(searchParams.get("height")) : null;
+          const urlDepth = isSelectedFromUrl ? Number(searchParams.get("depth")) : null;
+
           const isBodegaMilan = p.slug === 'estanteria-pared-lineal';
           
-          initialConfigs[p._id] = savedConfigs[p._id] || {
-            width: isBodegaMilan ? 35 : (p.width || 100),
-            height: p.height || 180,
-            depth: p.depth || 30,
-            wood: WOOD_TYPES[0]
+          initialConfigs[p._id] = {
+            width: urlWidth || savedConfig?.width || (isBodegaMilan ? 35 : (p.width || 100)),
+            height: urlHeight || savedConfig?.height || (p.height || 180),
+            depth: urlDepth || savedConfig?.depth || (p.depth || 30),
+            wood: currentWood,
+            cameraState: savedConfig?.cameraState
           };
         });
         setProductConfigs(initialConfigs);
@@ -101,7 +105,7 @@ export default function ShowroomPage() {
       }
     }
     loadProducts();
-  }, []);
+  }, [productSlug, searchParams]);
 
   // 2. Guardar en LocalStorage cada vez que cambien las configuraciones
   useEffect(() => {
@@ -134,7 +138,28 @@ export default function ShowroomPage() {
   return (
     <main className="min-h-screen bg-neutral-950 text-white">
       
-      <div className="max-w-7xl mx-auto px-4 py-20">
+      <div className="max-w-7xl mx-auto px-4 py-16 md:py-20">
+        <Link 
+          href="/" 
+          className="inline-flex items-center gap-2 text-neutral-500 hover:text-emerald-400 transition-colors mb-12 group"
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            width="18" 
+            height="18" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            className="transition-transform group-hover:-translate-x-1"
+          >
+            <path d="m15 18-6-6 6-6"/>
+          </svg>
+          <span className="text-xs font-bold uppercase tracking-[0.3em]">Volver</span>
+        </Link>
+
         <header className="mb-12">
           <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-white to-neutral-500 bg-clip-text text-transparent">
             3D Tech Showroom
@@ -301,5 +326,13 @@ export default function ShowroomPage() {
       )}
 
     </main>
+  );
+}
+
+export default function ShowroomPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-neutral-950 flex items-center justify-center text-white">Cargando Showroom...</div>}>
+      <ShowroomContent />
+    </Suspense>
   );
 }

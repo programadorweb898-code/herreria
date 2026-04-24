@@ -12,7 +12,7 @@ interface ProductDetailPageProps {
   }>;
 }
 
-const phone = "+5491100000000";
+const phone = "+5491123951078";
 
 export async function generateMetadata({ params }: ProductDetailPageProps) {
   const { slug } = await params;
@@ -75,8 +75,8 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             </WhatsAppButton>
             
             <Link
-              href={`/diseno-personalizado?product=${product.slug}&width=${product.width}&height=${product.height}&depth=${product.depth}`}
-              className="inline-flex w-full items-center justify-center bg-black px-6 py-4 text-[10px] font-semibold uppercase tracking-[0.22em] text-white transition hover:bg-neutral-800"
+              href={`/showroom?product=${product.slug}&width=${product.width}&height=${product.height}&depth=${product.depth}`}
+              className="inline-flex w-full items-center justify-center border border-black/10 bg-black px-6 py-4 text-[10px] font-semibold uppercase tracking-[0.22em] text-white transition hover:border-black/20 hover:bg-neutral-800 dark:border-white/20 dark:hover:border-white/40"
             >
               Diseño personalizado
             </Link>

@@ -25,7 +25,7 @@ export default function ContactoPage() {
             Abrir WhatsApp
           </WhatsAppButton>
           <Link
-            href="/diseno-personalizado"
+            href="/showroom"
             className="inline-flex items-center justify-center bg-black px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-white transition hover:bg-neutral-800"
           >
             Diseño personalizado

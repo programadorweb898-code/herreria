@@ -9,8 +9,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 const links = [
   { href: "/productos", label: "Nuestros trabajos" },
   { href: "/nosotros", label: "Quiénes somos" },
-  { href: "/diseno-personalizado", label: "Diseño personalizado" },
-  { href: "/showroom", label: "Showroom" },
+  { href: "/showroom", label: "Diseño personalizado" },
   { href: "#footer", label: "Contacto" },
 ];
 

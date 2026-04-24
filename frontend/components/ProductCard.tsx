@@ -46,7 +46,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             WhatsApp
           </WhatsAppButton>
           <Link 
-            href={`/diseno-personalizado?product=${product.slug}&width=${product.width || 100}&height=${product.height || 100}&depth=${product.depth || 30}`}
+            href={`/showroom?product=${product.slug}&width=${product.width || 100}&height=${product.height || 100}&depth=${product.depth || 30}`}
             className="inline-flex w-full items-center justify-center border border-white/10 bg-white/5 px-6 py-4 text-[10px] font-semibold uppercase tracking-[0.22em] text-white transition hover:bg-white/10"
           >
             Personalizar 3D

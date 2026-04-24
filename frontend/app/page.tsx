@@ -127,7 +127,7 @@ export default async function HomePage() {
               Contactar por WhatsApp
             </WhatsAppButton>
             <Link
-              href="/diseno-personalizado"
+              href="/showroom"
               className="w-full border border-white/10 bg-white/5 px-8 py-5 text-[10px] font-semibold uppercase tracking-[0.22em] text-white transition hover:bg-white/10 sm:w-auto"
             >
               Diseño personalizado

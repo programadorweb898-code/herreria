@@ -84,7 +84,7 @@ export default function NuestrosTrabajos() {
             en hierro y madera que transforma cada espacio con precisión y calidez.
           </p>
           <Link
-            href="/diseno-personalizado"
+            href="/showroom"
             className="inline-block bg-foreground text-white px-8 py-3 font-light uppercase tracking-[0.1em] text-sm hover:bg-slate-800 transition"
           >
             Explorar diseño personalizado

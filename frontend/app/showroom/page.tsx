@@ -11,9 +11,18 @@ import type { Product } from "@/types/product";
 import type { CameraState } from "@/components/ProfessionalViewer";
 
 const ProfessionalViewer = dynamic(() => import("@/components/ProfessionalViewer"), { ssr: false });
+const WOOD_TYPES = [
+  { id: 'roble',   name: 'Roble',   color: '#8B6914', roughness: 0.8, multiplier: 1.0 },
+  { id: 'pino',    name: 'Pino',    color: '#C4A35A', roughness: 0.7, multiplier: 0.8 },
+  { id: 'cerezo',  name: 'Cerezo',  color: '#6B2D0E', roughness: 0.75, multiplier: 1.2 },
+  { id: 'nogal',   name: 'Nogal',   color: '#3D1F0D', roughness: 0.7, multiplier: 1.3 },
+  { id: 'natural', name: 'Natural', color: '#D4A574', roughness: 0.9, multiplier: 0.9 },
+  { id: 'ebano',   name: 'Ébano',   color: '#1A0A00', roughness: 0.6, multiplier: 1.5 },
+] as const;
+type WoodType = typeof WOOD_TYPES[number];
 
 function ShowroomContent() {
-  const searchParams = useSearchParams();
+    const searchParams = useSearchParams();
   const productSlug = searchParams.get("product");
   
   const [products, setProducts] = useState<Product[]>([]);
@@ -228,7 +237,7 @@ function ShowroomContent() {
         <div className="bg-neutral-900 p-4 rounded-2xl border border-white/5">
           <h3 className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.2em] mb-3">Tipo de Madera</h3>
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            {WOOD_TYPES.map((wood) => (
+            {WOOD_TYPES.map((wood: WoodType) => (
               <button
                 key={wood.id}
                 onClick={() => updateConfig({ wood })}
@@ -263,7 +272,7 @@ function ShowroomContent() {
                 <div className="pt-6 border-t border-white/5 space-y-4">
                   <h3 className="font-bold text-emerald-400 uppercase tracking-widest text-sm">Tipo de Madera</h3>
                   <div className="grid grid-cols-2 gap-2">
-                    {WOOD_TYPES.map((wood) => (
+                    {WOOD_TYPES.map((wood: WoodType) => (
                       <button
                         key={wood.id}
                         onClick={() => updateConfig({ wood })}

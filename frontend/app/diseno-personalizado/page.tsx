@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import Image from "next/image";
 
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -18,7 +18,7 @@ const EstanteViewer = dynamic(() => import("@/components/EstanteViewer"), {
   ),
 });
 
-const phone = "+5491167894523";
+const phone = "+5491155606321";
 const message = "Hola! Me interesa solicitar un diseño personalizado.";
 
 // Slugs de productos con comportamiento especial
@@ -53,9 +53,11 @@ function NumberInput({
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-xs font-light uppercase tracking-[0.24em] text-accent">
-        {label}
-      </span>
+      {label && (
+        <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-emerald-400/50">
+          {label}
+        </span>
+      )}
       <div className="flex items-center gap-2">
         <input
           type="number"
@@ -64,9 +66,9 @@ function NumberInput({
           step={step}
           value={value}
           onChange={handleChange}
-          className="w-full border border-border bg-white px-3 py-2 text-sm uppercase tracking-[0.16em] text-foreground"
+          className="w-full border border-white/10 bg-white/5 px-3 py-2 text-sm uppercase tracking-[0.16em] text-white focus:border-emerald-500/50 focus:outline-none transition-colors"
         />
-        <span className="text-xs font-light uppercase tracking-[0.16em] text-slate-500">
+        <span className="text-[10px] font-medium uppercase tracking-[0.16em] text-neutral-500">
           {unit}
         </span>
       </div>
@@ -74,7 +76,7 @@ function NumberInput({
   );
 }
 
-export default function DisenoPersonalizadoPage() {
+function DisenoPersonalizadoContent() {
   const searchParams = useSearchParams();
   const productSlug = searchParams.get("product");
   const [product, setProduct] = useState<Product | null>(null);
@@ -240,10 +242,10 @@ export default function DisenoPersonalizadoPage() {
               </p>
             </div>
 
-            <div className="space-y-6">
+            <div className="flex flex-row gap-8 overflow-x-auto pb-6 custom-scrollbar snap-x">
               {/* Solo mostrar Ancho y Profundidad si no es Bodega o Banqueta */}
               {product?.slug !== BODEGA_MILAN_SLUG && product?.slug !== BANQUETA_CALI_SLUG && (
-                <div className="grid grid-cols-[1fr_100px] gap-4">
+                <div className="min-w-[220px] flex-1 flex-shrink-0 snap-start space-y-6">
                   <SliderControl
                     label="Ancho"
                     value={width}
@@ -253,7 +255,7 @@ export default function DisenoPersonalizadoPage() {
                     onChange={setWidth}
                   />
                   <NumberInput
-                    label=""
+                    label="Ingresar exacto"
                     value={width}
                     min={10}
                     max={250}
@@ -263,7 +265,7 @@ export default function DisenoPersonalizadoPage() {
                 </div>
               )}
 
-              <div className="grid grid-cols-[1fr_100px] gap-4">
+              <div className="min-w-[220px] flex-1 flex-shrink-0 snap-start space-y-6">
                 <SliderControl
                   label={product?.slug === BODEGA_MILAN_SLUG ? "Cantidad de Vinos" : "Alto"}
                   value={height}
@@ -274,7 +276,7 @@ export default function DisenoPersonalizadoPage() {
                   unit={product?.slug === BODEGA_MILAN_SLUG ? "vinos" : "cm"}
                 />
                 <NumberInput
-                  label=""
+                  label="Ingresar exacto"
                   value={height}
                   min={product?.slug === BODEGA_MILAN_SLUG ? 1 : 10}
                   max={product?.slug === BODEGA_MILAN_SLUG ? 20 : 250}
@@ -285,7 +287,7 @@ export default function DisenoPersonalizadoPage() {
               </div>
 
               {product?.slug !== BODEGA_MILAN_SLUG && product?.slug !== BANQUETA_CALI_SLUG && (
-                <div className="grid grid-cols-[1fr_100px] gap-4">
+                <div className="min-w-[220px] flex-1 flex-shrink-0 snap-start space-y-6">
                   <SliderControl
                     label="Profundidad"
                     value={depth}
@@ -295,7 +297,7 @@ export default function DisenoPersonalizadoPage() {
                     onChange={setDepth}
                   />
                   <NumberInput
-                    label=""
+                    label="Ingresar exacto"
                     value={depth}
                     min={10}
                     max={200}
@@ -347,5 +349,17 @@ export default function DisenoPersonalizadoPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function DisenoPersonalizadoPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-neutral-950 flex items-center justify-center text-white">
+        <p className="text-xs uppercase tracking-[0.4em] animate-pulse">Cargando experiencia...</p>
+      </div>
+    }>
+      <DisenoPersonalizadoContent />
+    </Suspense>
   );
 }

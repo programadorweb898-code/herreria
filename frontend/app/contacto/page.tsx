@@ -1,7 +1,7 @@
 import WhatsAppButton from "@/components/WhatsAppButton";
 import Link from "next/link";
 
-const phone = "+5491100000000";
+const phone = "+5491155606321";
 const message = "Hola! Me gustaría hacer una consulta.";
 
 export const metadata = {

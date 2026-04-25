@@ -97,7 +97,7 @@ export default function QuienesSomosPage() {
                   Optimizamos cada ensamble para lograr una estética minimalista sin sacrificar la robustez. Al trabajar de forma personalizada, permitimos a nuestros clientes y arquitectos definir dimensiones, tonalidades y configuraciones, resultando en muebles que son verdaderas soluciones espaciales.
                 </p>
 
-                <div className="grid grid-cols-2 gap-8 py-8 border-y border-slate-100 mt-8">
+                <div className="grid grid-cols-2 gap-8 py-4 border-y border-slate-100 mt-4">
                   <div>
                     <span className="block text-2xl font-light text-foreground">01. Funcionalidad</span>
                     <p className="text-xs uppercase tracking-widest text-slate-400 mt-1">Diseño para el Uso</p>
@@ -108,7 +108,7 @@ export default function QuienesSomosPage() {
                   </div>
                 </div>
 
-                <div className="pt-6">
+                <div className="pt-4">
                   <Link 
                     href="/productos" 
                     className="inline-flex items-center gap-4 group text-foreground font-semibold text-[10px] tracking-widest uppercase"

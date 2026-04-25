@@ -52,7 +52,7 @@ export default function Navbar() {
           <WhatsAppButton
             className="hidden sm:flex border border-emerald-500/50 bg-emerald-500/5 px-4 py-2 text-[10px] text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500 transition-all"
             message="Hola! Me gustaría hacer una consulta."
-            phone="+5491100000000"
+            phone="+5491155606321"
           >
             WhatsApp
           </WhatsAppButton>
@@ -105,7 +105,7 @@ export default function Navbar() {
           <WhatsAppButton
             className="w-full justify-center border border-emerald-500/50 bg-emerald-500/5 px-6 py-4 text-[10px] text-emerald-400"
             message="Hola! Me gustaría hacer una consulta."
-            phone="+5491100000000"
+            phone="+5491155606321"
           >
             WhatsApp
           </WhatsAppButton>

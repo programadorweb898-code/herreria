@@ -9,7 +9,7 @@ interface ProductCardProps {
   product: Product;
 }
 
-const phone = "+5491100000000";
+const phone = "+5491155606321";
 
 export default function ProductCard({ product }: ProductCardProps) {
   const message = `Hola! Me interesa: ${product.name} - Precio: $${formatWhatsAppPrice(product.price)}. ¿Me podés dar más info?`;

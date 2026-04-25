@@ -8,7 +8,7 @@ const links = [
 
 const socialLinks = [
   { 
-    href: "https://wa.me/5491167894523", 
+    href: "https://wa.me/5491155606321", 
     label: "WhatsApp",
     icon: (
       <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -82,7 +82,7 @@ export default function Footer() {
                   >
                     {social.icon}
                     <span className="text-[11px] font-light uppercase tracking-[0.2em]">
-                      {social.label === "WhatsApp" && "+54 9 (11) 6789-4523"}
+                      {social.label === "WhatsApp" && "+54 9 (11) 5560-6321"}
                       {social.label === "Instagram" && "@herreria.estudio"}
                       {social.label === "Email" && "info@herreria-estudio.com"}
                     </span>

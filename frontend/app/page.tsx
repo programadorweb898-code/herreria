@@ -122,7 +122,7 @@ export default async function HomePage() {
             <WhatsAppButton
               className="w-full border-emerald-500 bg-emerald-500 px-8 py-5 text-[10px] font-bold text-black hover:bg-emerald-600 sm:w-auto transition-colors"
               message="Hola! Me gustaría hacer una consulta."
-              phone="+5491100000000"
+              phone="+5491155606321"
             >
               Contactar por WhatsApp
             </WhatsAppButton>

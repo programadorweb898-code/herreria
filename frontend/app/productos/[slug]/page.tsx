@@ -12,7 +12,7 @@ interface ProductDetailPageProps {
   }>;
 }
 
-const phone = "+5491123951078";
+const phone = "+5491155606321";
 
 export async function generateMetadata({ params }: ProductDetailPageProps) {
   const { slug } = await params;

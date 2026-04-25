@@ -1,17 +1,15 @@
 import Image from "next/image";
-import Link from "next/link";
 
 export const metadata = {
-  title: "Quiénes somos | Herrería Estudio",
+  title: "Quienes somos | Herreria Estudio",
 };
 
 export default function QuienesSomosPage() {
   return (
-    <div className="bg-white text-on-surface overflow-x-hidden">
-      {/* Section 1: Hero */}
-      <section className="relative w-full h-[550px] md:h-[700px] overflow-hidden bg-black flex items-end px-6 pb-12 sm:px-8 sm:pb-16 lg:px-12 lg:pb-24 pt-8">
+    <div className="overflow-x-hidden bg-neutral-950 text-white">
+      <section className="relative flex h-[550px] w-full items-end overflow-hidden bg-black px-6 pb-12 pt-8 sm:px-8 sm:pb-16 md:h-[700px] lg:px-12 lg:pb-24">
         <Image
-          alt="Herrería Estudio - Nuestra Historia"
+          alt="Herreria Estudio - Nuestra Historia"
           className="absolute inset-0 object-cover"
           fill
           priority
@@ -19,122 +17,127 @@ export default function QuienesSomosPage() {
           src="/Gemini_Generated_Image_a4ph4a4ph4a4ph4a.png"
         />
         <div className="absolute inset-0 opacity-60">
-          <div className="w-full h-full bg-gradient-to-b from-black/40 to-black/80"></div>
+          <div className="h-full w-full bg-gradient-to-b from-black/40 to-black/80"></div>
         </div>
 
         <div className="relative z-10 w-full">
           <div className="max-w-4xl">
-            <span className="font-semibold text-[10px] tracking-widest uppercase text-white/60 block mb-4">
-              HERRERÍA ESTUDIO
+            <span className="mb-4 block text-[10px] font-semibold uppercase tracking-widest text-white/60">
+              HERRERIA ESTUDIO
             </span>
-            <h1 className="text-white text-5xl md:text-7xl lg:text-8xl font-extralight tracking-tighter leading-none">
+            <h1 className="text-5xl font-extralight leading-none tracking-tighter text-white md:text-7xl lg:text-8xl">
               Nuestra Historia
             </h1>
           </div>
         </div>
       </section>
 
-      {/* Section 2: Filosofía y Precisión */}
-      <section className="py-16 md:py-24 lg:py-32 px-6 sm:px-8 lg:px-12 bg-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-5xl font-light tracking-tighter leading-[1.1] text-foreground mb-12">
-            Diseño, Hierro y Madera
+      <section className="border-b border-white/5 bg-neutral-950 px-6 py-16 sm:px-8 md:py-24 lg:px-12 lg:py-12">
+        <div className="mx-auto max-w-4xl text-center">
+          <h2 className="mb-12 text-3xl font-light leading-[1.1] tracking-tighter text-white md:text-5xl">
+            Diseno, Hierro y Madera
           </h2>
           <div className="space-y-6">
-            <p className="text-lg md:text-xl font-light leading-relaxed text-slate-700">
-              En Herrería Estudio, fusionamos la robustez del hierro industrial con la calidez de maderas nobles para crear piezas únicas. Concebimos el mobiliario como una extensión de la arquitectura del lugar, donde cada detalle responde a una necesidad funcional y estética.
+            <p className="text-lg font-light leading-relaxed text-neutral-300 md:text-xl">
+              En Herreria Estudio, fusionamos la robustez del hierro industrial con la
+              calidez de maderas nobles para crear piezas unicas. Concebimos el
+              mobiliario como una extension de la arquitectura del lugar, donde cada
+              detalle responde a una necesidad funcional y estetica.
             </p>
-            <p className="text-base font-light leading-[1.8] text-slate-600">
-              Nuestros procesos combinan la precisión técnica de la metalurgia con la sensibilidad del trabajo artesanal en madera. Desde bibliotecas modulares hasta mesas de gran porte, cada pieza es diseñada bajo estándares de excelencia, asegurando durabilidad y un lenguaje visual coherente.
+            <p className="text-base font-light leading-[1.8] text-neutral-400">
+              Nuestros procesos combinan la precision tecnica de la metalurgia con la
+              sensibilidad del trabajo artesanal en madera. Desde bibliotecas modulares
+              hasta mesas de gran porte, cada pieza es disenada bajo estandares de
+              excelencia, asegurando durabilidad y un lenguaje visual coherente.
             </p>
-            <div className="pt-8 flex flex-col items-center">
-              <div className="h-px w-24 bg-foreground mb-4"></div>
-              <span className="font-semibold text-[10px] tracking-widest uppercase text-foreground">
-                Mobiliario con Lenguaje Arquitectónico
+            <div className="flex flex-col items-center pt-8">
+              <div className="mb-4 h-px w-24 bg-white/15"></div>
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-400">
+                Mobiliario con Lenguaje Arquitectonico
               </span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Section 3: Ingeniería y Proceso */}
-      <section className="py-16 md:py-24 lg:py-32 px-6 sm:px-8 lg:px-12 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="md:flow-root">
-            {/* Image Container with Float */}
-            <div className="relative w-full md:w-[45%] h-[500px] md:h-[700px] md:float-left md:mr-16 mb-10 md:mb-4 group">
+      <section className="border-b border-white/5 bg-neutral-900 px-6 py-16 sm:px-8 md:py-24 lg:px-12 lg:py-14">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.25fr)] lg:gap-12">
+            <div className="group relative h-[500px] w-full md:h-[620px] lg:h-[700px]">
               <Image
-                alt="Proceso de diseño y fabricación - Herrería Estudio"
-                className="w-full h-full object-cover shadow-2xl"
+                alt="Proceso de diseno y fabricacion - Herreria Estudio"
+                className="h-full w-full object-cover shadow-2xl"
                 fill
-                sizes="(max-width: 768px) 100vw, 45vw"
+                sizes="(max-width: 1024px) 100vw, 40vw"
                 src="/Gemini_Generated_Image_6fjvaz6fjvaz6fjv.png"
               />
-              <div className="absolute inset-0 border-[15px] border-white/5 pointer-events-none"></div>
-              <div className="absolute bottom-6 left-6 right-6 bg-black/80 backdrop-blur-sm p-4 border-l-2 border-white">
-                <p className="text-white text-[11px] font-light tracking-wider uppercase">
-                  Desarrollo de Mobiliario a Medida e Industrial
+              <div className="pointer-events-none absolute inset-0 border-[15px] border-white/5"></div>
+              <div className="absolute bottom-6 left-6 right-6 border-l-2 border-white bg-black/80 p-4 backdrop-blur-sm">
+                <p className="text-[11px] font-light uppercase tracking-wider text-white">
+                  Desarrollo de mobiliario a medida e industrial
                 </p>
               </div>
             </div>
 
-            {/* Text Content */}
-            <div className="text-slate-800">
-              <h3 className="text-4xl md:text-5xl lg:text-7xl font-extralight tracking-tighter mb-10 leading-none text-foreground">
-                Diseño Industrial <br className="hidden md:block" /> Personalizado
+            <div className="w-full text-white">
+              <h3 className="mb-10 text-4xl font-extralight leading-none tracking-tighter text-white md:text-5xl lg:text-7xl">
+                Diseno Industrial <br className="hidden md:block" /> Personalizado
               </h3>
-              
-              <div className="space-y-6 md:space-y-8 max-w-3xl">
-                <p className="text-lg md:text-xl font-medium leading-relaxed text-slate-900 border-l-4 border-foreground pl-6">
-                  Nuestra especialización en mobiliario de estilo industrial nace del equilibrio entre materialidad y uso. Fabricamos piezas diseñadas para perdurar, adaptándonos a las medidas y necesidades específicas de cada espacio.
-                </p>
-                
-                <p className="text-base md:text-lg font-light leading-relaxed text-slate-600">
-                  Cada proyecto en Herrería Estudio es abordado con rigor técnico. Integramos estructuras metálicas soldadas con precisión y tapas de madera maciza seleccionada, aplicando acabados de alta resistencia como powder coating y lacas protectoras, ideales tanto para el hogar como para entornos comerciales de alta exigencia.
-                </p>
-                
-                <p className="text-base md:text-lg font-light leading-relaxed text-slate-600">
-                  Optimizamos cada ensamble para lograr una estética minimalista sin sacrificar la robustez. Al trabajar de forma personalizada, permitimos a nuestros clientes y arquitectos definir dimensiones, tonalidades y configuraciones, resultando en muebles que son verdaderas soluciones espaciales.
+
+              <div className="w-full space-y-6 md:space-y-8">
+                <p className="border-l-4 border-emerald-400 pl-6 text-lg font-medium leading-relaxed text-white md:text-xl">
+                  Nuestra especializacion en mobiliario de estilo industrial nace del
+                  equilibrio entre materialidad y uso. Fabricamos piezas disenadas para
+                  perdurar, adaptandonos a las medidas y necesidades especificas de cada
+                  espacio.
                 </p>
 
-                <div className="grid grid-cols-2 gap-8 py-4 border-y border-slate-100 mt-4">
+                <p className="text-base font-light leading-relaxed text-neutral-400 md:text-lg">
+                  Cada proyecto en Herreria Estudio es abordado con rigor tecnico.
+                  Integramos estructuras metalicas soldadas con precision y tapas de
+                  madera maciza seleccionada, aplicando acabados de alta resistencia como
+                  powder coating y lacas protectoras, ideales tanto para el hogar como
+                  para entornos comerciales de alta exigencia.
+                </p>
+
+                <p className="text-base font-light leading-relaxed text-neutral-400 md:text-lg">
+                  Optimizamos cada ensamble para lograr una estetica minimalista sin
+                  sacrificar la robustez. Al trabajar de forma personalizada, permitimos
+                  a nuestros clientes y arquitectos definir dimensiones, tonalidades y
+                  configuraciones, resultando en muebles que son verdaderas soluciones
+                  espaciales.
+                </p>
+
+                <div className="mt-14 grid grid-cols-1 gap-6 border-y border-white/10 py-3 sm:grid-cols-2">
                   <div>
-                    <span className="block text-2xl font-light text-foreground">01. Funcionalidad</span>
-                    <p className="text-xs uppercase tracking-widest text-slate-400 mt-1">Diseño para el Uso</p>
+                    <span className="block text-2xl font-light text-white">01. Funcionalidad</span>
+                    <p className="mt-1 text-xs uppercase tracking-widest text-neutral-500">
+                      Diseno para el uso
+                    </p>
                   </div>
                   <div>
-                    <span className="block text-2xl font-light text-foreground">02. Materialidad</span>
-                    <p className="text-xs uppercase tracking-widest text-slate-400 mt-1">Hierro y Madera Noble</p>
+                    <span className="block text-2xl font-light text-white">02. Materialidad</span>
+                    <p className="mt-1 text-xs uppercase tracking-widest text-neutral-500">
+                      Hierro y madera noble
+                    </p>
                   </div>
                 </div>
 
-                <div className="pt-4">
-                  <Link 
-                    href="/productos" 
-                    className="inline-flex items-center gap-4 group text-foreground font-semibold text-[10px] tracking-widest uppercase"
-                  >
-                    <span className="bg-foreground text-white px-8 py-4 group-hover:bg-slate-800 transition-colors">
-                      Ver Proyectos Industriales
-                    </span>
-                    <span className="h-px w-12 bg-foreground group-hover:w-20 transition-all"></span>
-                  </Link>
-                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Section 4: Valores */}
-      <section className="py-16 md:py-24 lg:py-32 px-6 sm:px-8 lg:px-12 bg-white">
-        <div className="max-w-7xl mx-auto">
+      <section className="bg-neutral-950 px-6 py-16 sm:px-8 md:py-14 lg:px-12 lg:py-10">
+        <div className="mx-auto max-w-7xl">
           <div className="mb-12 md:mb-16">
-            <h2 className="text-3xl md:text-5xl font-light tracking-tighter leading-[1.1] text-foreground">
+            <h2 className="text-3xl font-light leading-[1.1] tracking-tighter text-white md:text-5xl">
               Nuestros Principios
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-12">
             {[
               {
                 title: "Materia Honesta",
@@ -142,21 +145,21 @@ export default function QuienesSomosPage() {
                   "Trabajamos hierro y acero con terminaciones simples, honestas y duraderas. La materia es el mensaje.",
               },
               {
-                title: "Precisión",
+                title: "Precision",
                 description:
-                  "Cada estructura se resuelve con proporciones claras y una ejecución cuidada al detalle.",
+                  "Cada estructura se resuelve con proporciones claras y una ejecucion cuidada al detalle.",
               },
               {
                 title: "Escala Humana",
                 description:
-                  "Diseñamos para el uso real, el ritmo cotidiano y los espacios que habitamos.",
+                  "Disenamos para el uso real, el ritmo cotidiano y los espacios que habitamos.",
               },
             ].map((value, index) => (
-              <div key={index} className="space-y-4 border-l-2 border-slate-200 pl-6">
-                <h3 className="text-xl md:text-2xl font-light tracking-tight text-foreground">
+              <div key={index} className="space-y-4 border-l-2 border-white/10 pl-6">
+                <h3 className="text-xl font-light tracking-tight text-white md:text-2xl">
                   {value.title}
                 </h3>
-                <p className="text-base font-light leading-relaxed text-slate-600">
+                <p className="text-base font-light leading-relaxed text-neutral-400">
                   {value.description}
                 </p>
               </div>

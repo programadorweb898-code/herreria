@@ -33,7 +33,7 @@ function ShowroomContent() {
     width: number;
     height: number;
     depth: number;
-    wood: typeof WOOD_TYPES[0];
+    wood: WoodType;
     cameraState?: CameraState;
   }>>({});
   
@@ -86,7 +86,7 @@ function ShowroomContent() {
           const savedConfig = savedConfigs[p._id];
           
           // Asegurarnos de que el objeto de madera tenga todas las propiedades actuales (como multiplier)
-          let currentWood = WOOD_TYPES[0];
+          let currentWood: WoodType = WOOD_TYPES[0];
           if (savedConfig?.wood?.id) {
             const found = WOOD_TYPES.find(w => w.id === savedConfig.wood.id);
             if (found) currentWood = found;

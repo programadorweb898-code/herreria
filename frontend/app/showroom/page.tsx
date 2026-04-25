@@ -222,13 +222,13 @@ function ShowroomContent() {
         </div>
         <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/5">
           <div className="col-span-1">
-             <SliderControl label="Ancho" value={currentConfig.width} min={10} max={250} onChange={(v) => updateConfig({ width: v })} />
+             <SliderControl label="Ancho" value={currentConfig.width} min={10} max={250} onChange={(v) => updateConfig({ width: v })} step={1} />
           </div>
           <div className="col-span-1">
-             <SliderControl label="Alto" value={currentConfig.height} min={10} max={250} onChange={(v) => updateConfig({ height: v })} />
+             <SliderControl label="Alto" value={currentConfig.height} min={10} max={250} onChange={(v) => updateConfig({ height: v })} step={1} />
           </div>
           <div className="col-span-1">
-             <SliderControl label="Prof" value={currentConfig.depth} min={10} max={200} onChange={(v) => updateConfig({ depth: v })} />
+             <SliderControl label="Prof" value={currentConfig.depth} min={10} max={200} onChange={(v) => updateConfig({ depth: v })} step={1} />
           </div>
         </div>
       </div>
@@ -263,9 +263,9 @@ function ShowroomContent() {
 
               <div className="pt-6 border-t border-white/5 space-y-6">
                 <h3 className="font-bold text-emerald-400 uppercase tracking-widest text-sm">Ajustar Medidas</h3>
-                <SliderControl label="Ancho" value={currentConfig.width} min={10} max={250} onChange={(v) => updateConfig({ width: v })} />
-                <SliderControl label="Alto" value={currentConfig.height} min={10} max={250} onChange={(v) => updateConfig({ height: v })} />
-                <SliderControl label="Profundidad" value={currentConfig.depth} min={10} max={200} onChange={(v) => updateConfig({ depth: v })} />
+                <SliderControl label="Ancho" value={currentConfig.width} min={10} max={250} onChange={(v) => updateConfig({ width: v })} step={1} />
+                <SliderControl label="Alto" value={currentConfig.height} min={10} max={250} onChange={(v) => updateConfig({ height: v })} step={1} />
+                <SliderControl label="Profundidad" value={currentConfig.depth} min={10} max={200} onChange={(v) => updateConfig({ depth: v })} step={1} />
               </div>
               
               {selectedProduct.hasWood && (

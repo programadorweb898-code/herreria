@@ -57,8 +57,8 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
-      <section className="px-6 py-24 sm:px-8 lg:px-12 lg:py-32" id="catalogo">
+      
+      <section className="px-6 py-24 sm:px-8 lg:px-12 lg:py-10" id="catalogo">
         <div className="mx-auto max-w-[1440px]">
           <div className="mb-14 flex flex-col gap-6 border-b border-white/5 pb-8 md:flex-row md:items-end md:justify-between">
             <div>
@@ -70,9 +70,6 @@ export default async function HomePage() {
               </h2>
             </div>
 
-            <p className="text-[10px] font-light uppercase tracking-[0.24em] text-neutral-500">
-              Selección actual / Hierro / Madera / Series cortas
-            </p>
           </div>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">

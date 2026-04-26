@@ -322,7 +322,7 @@ export default function ProfessionalViewer({
   }, []);
 
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-xl bg-neutral-900 shadow-2xl touch-none">
+    <div className="canvas-container relative h-full w-full overflow-hidden rounded-xl bg-neutral-900 shadow-2xl touch-none">
       <Canvas
         key={`${modelUrl}-${contextResetKey}`}
         camera={{ fov: 42, position: [180, 180, 180], near: 0.1, far: 2000 }}
@@ -431,5 +431,3 @@ function Loader() {
     </Html>
   );
 }
-
-useGLTF.preload("/models/base.glb");

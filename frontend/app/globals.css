@@ -59,3 +59,36 @@ button {
     transform: translateX(-33.333%);
   }
 }
+
+/* Scrollbar utilities */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Custom scrollbar para diseño personalizado */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #10b981 #0a0a0a;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #10b981;
+  border-radius: 2px;
+}
+
+/* iOS Safari - prevenir scroll de página al interactuar con canvas 3D */
+.canvas-container {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: auto;
+  touch-action: none;
+}

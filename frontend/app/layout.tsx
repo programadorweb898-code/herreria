@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import * as Sentry from "@sentry/nextjs";
 import { Inter } from "next/font/google";
 
 import Footer from "@/components/Footer";
@@ -13,10 +14,24 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-export const metadata: Metadata = {
+const baseMetadata: Metadata = {
   title: "Herrería Estudio",
   description: "Muebles de hierro y madera con una estética industrial contemporánea.",
 };
+
+export function generateMetadata(): Metadata {
+  const traceData = Object.fromEntries(
+    Object.entries(Sentry.getTraceData()).filter(([, value]) => value !== undefined),
+  ) as NonNullable<Metadata["other"]>;
+
+  return {
+    ...baseMetadata,
+    other: {
+      ...baseMetadata.other,
+      ...traceData,
+    },
+  };
+}
 
 export default function RootLayout({
   children,

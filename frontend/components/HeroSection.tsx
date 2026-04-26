@@ -9,9 +9,11 @@ export default function HeroSection() {
           alt="Interior editorial con mobiliario de hierro y madera"
           className="object-cover"
           fill
+          fetchPriority="high"
           priority
           sizes="100vw"
           src="/Muebles_Estilo_Insdustrial_4.jpg"
+          unoptimized
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10" />
       </div>

@@ -1,160 +1,169 @@
 "use client";
 
-import React, { useState, useRef, Suspense } from "react";
+import { Suspense, memo, useCallback, useMemo, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { 
-  OrbitControls, 
-  Environment, 
-  ContactShadows, 
-  Float,
-  Box,
-  Cylinder
-} from "@react-three/drei";
+import { Box, Cylinder, Environment, Float, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import gsap from "gsap";
 
-// --- Tipos ---
+import { getCanvasDpr, isSafariBrowser } from "@/components/three/performance";
+
 interface BottleProps {
   position: [number, number, number];
   color: string;
 }
 
-// --- Componente de Botella (Simulado o Carga GLB) ---
-const Bottle = ({ position, color }: BottleProps) => {
+const Bottle = memo(function Bottle({ position, color }: BottleProps) {
   const meshRef = useRef<THREE.Group>(null);
-  
-  // Si tuvieras un GLB de botella:
-  // const { scene } = useGLTF('/models/bottle.glb');
-  // const clone = useMemo(() => scene.clone(), [scene]);
+
+  const glassMaterial = useMemo(
+    () => <meshStandardMaterial color={color} roughness={0.18} metalness={0.55} />,
+    [color],
+  );
+  const capMaterial = useMemo(
+    () => <meshStandardMaterial color="#c9a227" metalness={0.85} roughness={0.28} />,
+    [],
+  );
 
   return (
     <group position={position} ref={meshRef}>
-      <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
-        <Cylinder args={[0.03, 0.05, 0.2, 32]}>
-          <meshStandardMaterial color={color} roughness={0.1} metalness={0.8} />
-        </Cylinder>
-        <Cylinder args={[0.015, 0.015, 0.05, 32]} position={[0, 0.12, 0]}>
-          <meshStandardMaterial color="gold" metalness={1} roughness={0.2} />
+      <Float speed={1.6} rotationIntensity={0.35} floatIntensity={0.35}>
+        <Cylinder args={[0.03, 0.05, 0.2, 20]}>{glassMaterial}</Cylinder>
+        <Cylinder args={[0.015, 0.015, 0.05, 20]} position={[0, 0.12, 0]}>
+          {capMaterial}
         </Cylinder>
       </Float>
     </group>
   );
-};
+});
 
-// --- Componente Puerta con Animación GSAP ---
-const InteractiveDoor = ({ position, rotation, side }: { position: [number, number, number], rotation: [number, number, number], side: 'left' | 'right' }) => {
+const InteractiveDoor = memo(function InteractiveDoor({
+  position,
+  rotation,
+  side,
+}: {
+  position: [number, number, number];
+  rotation: [number, number, number];
+  side: "left" | "right";
+}) {
   const groupRef = useRef<THREE.Group>(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  const toggleDoor = () => {
+  const toggleDoor = useCallback(() => {
     if (!groupRef.current) return;
-    
-    const targetRotation = isOpen ? 0 : (side === 'left' ? Math.PI / 2 : -Math.PI / 2);
-    
+
+    const targetRotation = isOpen ? 0 : side === "left" ? Math.PI / 2 : -Math.PI / 2;
     gsap.to(groupRef.current.rotation, {
       y: targetRotation,
-      duration: 1.2,
-      ease: "power3.inOut"
+      duration: 0.9,
+      ease: "power2.out",
     });
-    
-    setIsOpen(!isOpen);
-  };
+
+    setIsOpen((prev) => !prev);
+  }, [isOpen, side]);
 
   return (
     <group position={position}>
-      {/* El grupo actúa como bisagra (pivote) */}
       <group ref={groupRef} rotation={rotation}>
-        <Box 
-          args={[0.45, 0.9, 0.02]} 
-          position={[side === 'left' ? 0.225 : -0.225, 0, 0]} 
+        <Box
+          args={[0.45, 0.9, 0.02]}
+          position={[side === "left" ? 0.225 : -0.225, 0, 0]}
           onClick={(e) => {
             e.stopPropagation();
             toggleDoor();
           }}
         >
-          <meshStandardMaterial color="#222" roughness={0.3} metalness={0.7} />
+          <meshStandardMaterial color="#222" roughness={0.34} metalness={0.5} />
         </Box>
-        {/* Manija */}
-        <Box args={[0.02, 0.1, 0.03]} position={[side === 'left' ? 0.4 : -0.4, 0, 0.02]}>
-          <meshStandardMaterial color="gold" />
+        <Box args={[0.02, 0.1, 0.03]} position={[side === "left" ? 0.4 : -0.4, 0, 0.02]}>
+          <meshStandardMaterial color="#c9a227" metalness={0.9} roughness={0.25} />
         </Box>
       </group>
     </group>
   );
-};
+});
 
-// --- Rack Procedural ---
-const ProceduralRack = () => {
-  const [bottles, setBottles] = useState<{id: number, pos: [number, number, number], color: string}[]>([]);
+const ProceduralRack = memo(function ProceduralRack() {
+  const [bottles, setBottles] = useState<{ id: number; pos: [number, number, number]; color: string }[]>([]);
 
-  const addBottle = () => {
-    const newBottle = {
-      id: Date.now(),
-      pos: [(Math.random() - 0.5) * 0.8, -0.2, (Math.random() - 0.5) * 0.3] as [number, number, number],
-      color: `hsl(${Math.random() * 360}, 70%, 50%)`
-    };
-    setBottles([...bottles, newBottle]);
-  };
+  const addBottle = useCallback(() => {
+    setBottles((prev) => [
+      ...prev,
+      {
+        id: Date.now(),
+        pos: [(Math.random() - 0.5) * 0.8, -0.2, (Math.random() - 0.5) * 0.3] as [number, number, number],
+        color: `hsl(${Math.random() * 360}, 70%, 50%)`,
+      },
+    ]);
+  }, []);
 
   return (
     <group>
-      {/* Estructura del Rack (Simple para el ejemplo) */}
       <Box args={[1, 0.05, 0.5]} position={[0, -0.45, 0]}>
-        <meshStandardMaterial color="#111" metalness={0.9} roughness={0.1} />
+        <meshStandardMaterial color="#111" metalness={0.78} roughness={0.2} />
       </Box>
       <Box args={[1, 0.05, 0.5]} position={[0, 0.45, 0]}>
-        <meshStandardMaterial color="#111" metalness={0.9} roughness={0.1} />
+        <meshStandardMaterial color="#111" metalness={0.78} roughness={0.2} />
       </Box>
       <Box args={[0.05, 1, 0.5]} position={[-0.475, 0, 0]}>
-        <meshStandardMaterial color="#111" metalness={0.9} roughness={0.1} />
+        <meshStandardMaterial color="#111" metalness={0.78} roughness={0.2} />
       </Box>
       <Box args={[0.05, 1, 0.5]} position={[0.475, 0, 0]}>
-        <meshStandardMaterial color="#111" metalness={0.9} roughness={0.1} />
+        <meshStandardMaterial color="#111" metalness={0.78} roughness={0.2} />
       </Box>
       <Box args={[1, 1, 0.02]} position={[0, 0, -0.24]}>
         <meshStandardMaterial color="#050505" />
       </Box>
 
-      {/* Puertas Interactivas */}
       <InteractiveDoor position={[-0.45, 0, 0.25]} rotation={[0, 0, 0]} side="left" />
       <InteractiveDoor position={[0.45, 0, 0.25]} rotation={[0, 0, 0]} side="right" />
 
-      {/* Botellas Dinámicas */}
-      {bottles.map(b => (
-        <Bottle key={b.id} position={b.pos} color={b.color} />
+      {bottles.map((bottle) => (
+        <Bottle key={bottle.id} position={bottle.pos} color={bottle.color} />
       ))}
 
-      {/* Botón flotante para agregar botellas (en espacio 3D) */}
-      <mesh position={[0, 0.6, 0]} onClick={(e) => { e.stopPropagation(); addBottle(); }}>
+      <mesh
+        position={[0, 0.6, 0]}
+        onClick={(e) => {
+          e.stopPropagation();
+          addBottle();
+        }}
+      >
         <Box args={[0.2, 0.1, 0.05]}>
-          <meshStandardMaterial color="emerald" />
+          <meshStandardMaterial color="#10b981" />
         </Box>
       </mesh>
     </group>
   );
-};
+});
 
 export default function InteractiveShowcase() {
+  const isSafari = isSafariBrowser();
+  const dpr = getCanvasDpr();
+
   return (
-    <div className="w-full h-[600px] bg-neutral-950 rounded-2xl relative">
-      <div className="absolute top-4 right-4 z-10 text-white bg-white/10 p-4 rounded-lg backdrop-blur-md border border-white/10">
-        <h2 className="text-xl font-bold mb-1">Rack Interactivo Pro</h2>
-        <p className="text-xs text-neutral-400">Click en puertas para abrir. Click arriba para añadir botellas.</p>
+    <div className="relative h-[600px] w-full rounded-2xl bg-neutral-950">
+      <div className="absolute right-4 top-4 z-10 rounded-lg border border-white/10 bg-white/10 p-4 text-white backdrop-blur-md">
+        <h2 className="mb-1 text-xl font-bold">Rack Interactivo Pro</h2>
+        <p className="text-xs text-neutral-400">Click en puertas para abrir. Click arriba para anadir botellas.</p>
       </div>
-      
+
       <Canvas
-        shadows
-        gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}
+        dpr={dpr}
+        gl={{
+          antialias: false,
+          powerPreference: isSafari ? "low-power" : "high-performance",
+          preserveDrawingBuffer: false,
+        }}
         camera={{ position: [2, 2, 2], fov: 45 }}
       >
         <Suspense fallback={null}>
-          <Environment preset="studio" />
-          <ambientLight intensity={0.2} />
-          <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} shadow-mapSize={[2048, 2048]} castShadow />
-          
+          {!isSafari && <Environment preset="studio" />}
+          <ambientLight intensity={0.45} />
+          <directionalLight position={[5, 6, 4]} intensity={1} />
+          <directionalLight position={[-3, 2, -3]} intensity={0.2} />
+
           <ProceduralRack />
-          
-          <ContactShadows position={[0, -0.5, 0]} opacity={0.5} scale={10} blur={2.5} far={0.8} />
           <OrbitControls makeDefault minPolarAngle={Math.PI / 4} maxPolarAngle={Math.PI / 2} />
         </Suspense>
       </Canvas>

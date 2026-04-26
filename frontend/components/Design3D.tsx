@@ -2,11 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import type {
+  LineBasicMaterial,
+  LineSegments,
   Mesh,
   PerspectiveCamera,
   Scene,
   WebGLRenderer,
 } from "three";
+
+import { getMaxPixelRatio, isSafariBrowser } from "@/components/three/performance";
 
 interface Design3DProps {
   design: {
@@ -22,6 +26,8 @@ interface Design3DProps {
 
 interface SceneState {
   mesh: Mesh;
+  wireframe: LineSegments;
+  linesMaterial: LineBasicMaterial;
   renderer: WebGLRenderer;
   scene: Scene;
   camera: PerspectiveCamera;
@@ -31,6 +37,7 @@ interface SceneState {
 export default function Design3D({ design }: Design3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<SceneState | null>(null);
+  const rendererCleanupRef = useRef<(() => void) | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -68,16 +75,38 @@ export default function Design3D({ design }: Design3DProps) {
 
           const width = container.clientWidth || 600;
           const height = container.clientHeight || 400;
+          const isSafari = isSafariBrowser();
 
           const camera = new PerspectiveCamera(50, width / height, 0.1, 1000);
           camera.position.set(250, 200, 300);
           camera.lookAt(0, 0, 0);
 
-          const renderer = new WebGLRenderer({ antialias: true, alpha: true });
+          const renderer = new WebGLRenderer({
+            antialias: false,
+            alpha: true,
+            powerPreference: isSafari ? "low-power" : "high-performance",
+            preserveDrawingBuffer: false,
+          });
           renderer.setSize(width, height);
-          renderer.setPixelRatio(window.devicePixelRatio);
-          renderer.shadowMap.enabled = true;
+          renderer.setPixelRatio(getMaxPixelRatio());
           container.appendChild(renderer.domElement);
+
+          const handleContextLost = (event: Event) => {
+            event.preventDefault();
+            cancelAnimationFrame(animationId);
+            setIsLoaded(false);
+          };
+
+          const handleContextRestored = () => {
+            setIsLoaded(true);
+          };
+
+          renderer.domElement.addEventListener("webglcontextlost", handleContextLost, false);
+          renderer.domElement.addEventListener("webglcontextrestored", handleContextRestored, false);
+          rendererCleanupRef.current = () => {
+            renderer.domElement.removeEventListener("webglcontextlost", handleContextLost, false);
+            renderer.domElement.removeEventListener("webglcontextrestored", handleContextRestored, false);
+          };
 
           const scale = 0.8;
           const scaledWidth = design.width * scale;
@@ -87,48 +116,36 @@ export default function Design3D({ design }: Design3DProps) {
           const geometry = new BoxGeometry(scaledWidth, scaledHeight, scaledDepth);
           const material = new MeshPhongMaterial({
             color: 0xd0d0d0,
-            shininess: 20,
+            shininess: 12,
             wireframe: false,
           });
 
           const mesh = new Mesh(geometry, material);
-          mesh.castShadow = true;
-          mesh.receiveShadow = true;
           scene.add(mesh);
 
           const edges = new EdgesGeometry(geometry);
           const linesMaterial = new LineBasicMaterial({
             color: 0x333333,
-            linewidth: 2,
             transparent: true,
             opacity: 0.7,
           });
           const wireframe = new LineSegments(edges, linesMaterial);
           mesh.add(wireframe);
 
-          const ambientLight = new AmbientLight(0xffffff, 0.7);
-          scene.add(ambientLight);
+          scene.add(new AmbientLight(0xffffff, 0.85));
 
-          const directionalLight = new DirectionalLight(0xffffff, 0.6);
-          directionalLight.position.set(200, 200, 200);
-          directionalLight.castShadow = true;
-          directionalLight.shadow.mapSize.width = 2048;
-          directionalLight.shadow.mapSize.height = 2048;
-          directionalLight.shadow.camera.far = 1000;
-          directionalLight.shadow.camera.left = -500;
-          directionalLight.shadow.camera.right = 500;
-          directionalLight.shadow.camera.top = 500;
-          directionalLight.shadow.camera.bottom = -500;
-          scene.add(directionalLight);
+          const keyLight = new DirectionalLight(0xffffff, 0.65);
+          keyLight.position.set(200, 200, 200);
+          scene.add(keyLight);
 
-          const fillLight = new DirectionalLight(0xffffff, 0.2);
-          fillLight.position.set(-200, 100, -200);
+          const fillLight = new DirectionalLight(0xffffff, 0.18);
+          fillLight.position.set(-180, 80, -150);
           scene.add(fillLight);
 
           const animate = () => {
             animationId = requestAnimationFrame(animate);
-            mesh.rotation.x += 0.0015;
-            mesh.rotation.y += 0.002;
+            mesh.rotation.x += 0.0012;
+            mesh.rotation.y += 0.0016;
             renderer.render(scene, camera);
           };
           animate();
@@ -140,15 +157,17 @@ export default function Design3D({ design }: Design3DProps) {
             camera.aspect = nextWidth / nextHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(nextWidth, nextHeight);
+            renderer.setPixelRatio(getMaxPixelRatio());
           };
 
           window.addEventListener("resize", handleResize);
-          sceneRef.current = { mesh, renderer, scene, camera, animationId };
+          sceneRef.current = { mesh, wireframe, linesMaterial, renderer, scene, camera, animationId };
           setIsLoaded(true);
 
           if (disposed) {
             window.removeEventListener("resize", handleResize);
             cancelAnimationFrame(animationId);
+            rendererCleanupRef.current?.();
             renderer.dispose();
             geometry.dispose();
             edges.dispose();
@@ -156,15 +175,17 @@ export default function Design3D({ design }: Design3DProps) {
             linesMaterial.dispose();
           }
         } catch (error) {
-          console.error("Error al crear visualizaciÃ³n 3D:", error);
+          console.error("Error al crear visualizacion 3D:", error);
           setIsLoaded(false);
         }
-      }
+      },
     );
 
     return () => {
       disposed = true;
       setIsLoaded(false);
+
+      rendererCleanupRef.current?.();
 
       if (handleResize) {
         window.removeEventListener("resize", handleResize);
@@ -176,7 +197,10 @@ export default function Design3D({ design }: Design3DProps) {
 
       if (sceneRef.current) {
         sceneRef.current.renderer.dispose();
+        sceneRef.current.wireframe.geometry.dispose();
+        sceneRef.current.linesMaterial.dispose();
         sceneRef.current.mesh.geometry.dispose();
+
         if (Array.isArray(sceneRef.current.mesh.material)) {
           for (const material of sceneRef.current.mesh.material) {
             material.dispose();
@@ -184,6 +208,7 @@ export default function Design3D({ design }: Design3DProps) {
         } else {
           sceneRef.current.mesh.material.dispose();
         }
+
         sceneRef.current = null;
       }
     };
@@ -192,47 +217,31 @@ export default function Design3D({ design }: Design3DProps) {
   return (
     <div className="w-full space-y-4">
       {!isLoaded && (
-        <div className="w-full h-96 rounded border border-border bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center text-sm text-slate-500">
-          Cargando visualizaciÃ³n 3D...
+        <div className="flex h-96 w-full items-center justify-center rounded border border-border bg-gradient-to-br from-slate-50 to-slate-100 text-sm text-slate-500">
+          Cargando visualizacion 3D...
         </div>
       )}
       <div
         ref={containerRef}
-        className="w-full h-96 rounded border border-border bg-gray-50"
+        className="h-96 w-full rounded border border-border bg-gray-50"
         style={{ minHeight: "400px", display: isLoaded ? "block" : "none" }}
       />
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4 text-xs">
+      <div className="grid grid-cols-2 gap-4 text-xs md:grid-cols-4">
         <div>
-          <p className="text-slate-600 font-semibold uppercase tracking-wider mb-1">
-            Ancho
-          </p>
-          <p className="text-lg font-light text-foreground">
-            {design.width} cm
-          </p>
+          <p className="mb-1 font-semibold uppercase tracking-wider text-slate-600">Ancho</p>
+          <p className="text-lg font-light text-foreground">{design.width} cm</p>
         </div>
         <div>
-          <p className="text-slate-600 font-semibold uppercase tracking-wider mb-1">
-            Alto
-          </p>
-          <p className="text-lg font-light text-foreground">
-            {design.height} cm
-          </p>
+          <p className="mb-1 font-semibold uppercase tracking-wider text-slate-600">Alto</p>
+          <p className="text-lg font-light text-foreground">{design.height} cm</p>
         </div>
         <div>
-          <p className="text-slate-600 font-semibold uppercase tracking-wider mb-1">
-            Profundidad
-          </p>
-          <p className="text-lg font-light text-foreground">
-            {design.depth} cm
-          </p>
+          <p className="mb-1 font-semibold uppercase tracking-wider text-slate-600">Profundidad</p>
+          <p className="text-lg font-light text-foreground">{design.depth} cm</p>
         </div>
         <div>
-          <p className="text-slate-600 font-semibold uppercase tracking-wider mb-1">
-            Material
-          </p>
-          <p className="text-lg font-light text-foreground capitalize">
-            {design.material}
-          </p>
+          <p className="mb-1 font-semibold uppercase tracking-wider text-slate-600">Material</p>
+          <p className="text-lg font-light capitalize text-foreground">{design.material}</p>
         </div>
       </div>
     </div>

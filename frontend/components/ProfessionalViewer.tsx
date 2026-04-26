@@ -1,27 +1,16 @@
 "use client";
 
-import React, { Suspense, useState, useEffect, useRef } from "react";
+import { Suspense, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, ThreeEvent, useThree } from "@react-three/fiber";
-import { 
-  OrbitControls, 
-  Stage, 
-  useGLTF, 
-  Html,
-  useCursor
-} from "@react-three/drei";
+import { Html, OrbitControls, useCursor, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 
-// --- Tipos ---
+import { disposeObjectResources, getCanvasDpr, isSafariBrowser } from "@/components/three/performance";
+
 export interface CameraState {
   position: [number, number, number];
   target: [number, number, number];
-}
-
-interface MeshNode {
-  name: string;
-  uuid: string;
-  visible: boolean;
 }
 
 interface ProfessionalViewerProps {
@@ -37,103 +26,95 @@ interface ProfessionalViewerProps {
   onCameraChange?: (state: CameraState) => void;
 }
 
-// --- Componente de Controles Dinámicos ---
-const DynamicOrbitControls = ({ 
-  controlsRef, 
-  onCameraChange, 
-  setShouldAdjust,
+const DynamicOrbitControls = memo(function DynamicOrbitControls({
+  controlsRef,
+  onCameraChange,
   objWidth,
-  objHeight
-}: { 
-  controlsRef: React.RefObject<OrbitControlsImpl>, 
-  onCameraChange: () => void, 
-  setShouldAdjust: (val: boolean) => void,
-  objWidth: number,
-  objHeight: number
-}) => {
-  const { size, camera } = useThree();
-  
-  // Calculamos la distancia necesaria para que el objeto ocupe X porcentaje
-  const getDistanceForPercent = (percent: number) => {
-    const perspectiveCamera = camera as THREE.PerspectiveCamera;
-    const fovRad = (perspectiveCamera.fov * Math.PI) / 180;
-    const aspect = size.width / size.height;
-    
-    // Distancia para ancho y alto
-    const distW = (objWidth / percent) / (2 * Math.tan(fovRad / 2) * aspect);
-    const distH = (objHeight / percent) / (2 * Math.tan(fovRad / 2));
-    
-    return Math.max(distW, distH);
-  };
+  objHeight,
+}: {
+  controlsRef: React.RefObject<OrbitControlsImpl>;
+  onCameraChange: () => void;
+  objWidth: number;
+  objHeight: number;
+}) {
+  const { size, camera, invalidate } = useThree();
 
-  // minDistance: objeto al 120% (permite ver de cerca)
+  const getDistanceForPercent = useCallback(
+    (percent: number) => {
+      const perspectiveCamera = camera as THREE.PerspectiveCamera;
+      const fovRad = (perspectiveCamera.fov * Math.PI) / 180;
+      const aspect = size.width / Math.max(size.height, 1);
+      const distW = (objWidth / percent) / (2 * Math.tan(fovRad / 2) * aspect);
+      const distH = (objHeight / percent) / (2 * Math.tan(fovRad / 2));
+      return Math.max(distW, distH);
+    },
+    [camera, objHeight, objWidth, size.height, size.width],
+  );
+
   const minDistance = getDistanceForPercent(1.2);
-  // maxDistance: objeto al 15% (permite alejarse más)
   const maxDistance = getDistanceForPercent(0.15);
+  const handleControlsChange = useCallback(() => {
+    invalidate();
+  }, [invalidate]);
 
   return (
-    <OrbitControls 
+    <OrbitControls
       ref={controlsRef}
-      makeDefault 
-      enableZoom={true}
+      makeDefault
+      enableZoom
       minDistance={minDistance}
       maxDistance={maxDistance}
-      minPolarAngle={0} 
-      maxPolarAngle={Math.PI} 
-      enableDamping={true}
-      dampingFactor={0.05}
-      rotateSpeed={0.8}
-      zoomSpeed={1.2}
-      onStart={() => setShouldAdjust(false)}
+      minPolarAngle={0}
+      maxPolarAngle={Math.PI}
+      enableDamping
+      dampingFactor={0.06}
+      rotateSpeed={0.75}
+      zoomSpeed={1.05}
+      onChange={handleControlsChange}
       onEnd={onCameraChange}
     />
   );
-};
+});
 
-// --- Utilidad para generar textura de madera ---
-const createWoodTexture = (baseColor: string) => {
-  if (typeof document === 'undefined') return null;
-  
-  const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 512;
-  const ctx = canvas.getContext('2d');
+function createWoodTexture(baseColor: string) {
+  if (typeof document === "undefined") return null;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext("2d");
   if (!ctx) return null;
 
-  // Fondo base
   ctx.fillStyle = baseColor;
-  ctx.fillRect(0, 0, 512, 512);
+  ctx.fillRect(0, 0, 256, 256);
 
-  // Añadir vetas de madera
   const colorObj = new THREE.Color(baseColor);
-  const darkerColor = `#${colorObj.clone().multiplyScalar(0.8).getHexString()}`;
+  const darkerColor = `#${colorObj.clone().multiplyScalar(0.82).getHexString()}`;
 
   ctx.strokeStyle = darkerColor;
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 1.5;
 
-  // Dibujar líneas irregulares para simular vetas
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 48; i += 1) {
     ctx.beginPath();
-    ctx.globalAlpha = Math.random() * 0.3;
-    let x = Math.random() * 512;
+    ctx.globalAlpha = Math.random() * 0.22;
+    let x = Math.random() * 256;
     let y = 0;
     ctx.moveTo(x, y);
-    
-    for (let j = 0; j < 10; j++) {
-      x += (Math.random() - 0.5) * 20;
-      y += 51.2;
+
+    for (let j = 0; j < 8; j += 1) {
+      x += (Math.random() - 0.5) * 14;
+      y += 32;
       ctx.lineTo(x, y);
     }
     ctx.stroke();
   }
 
-  // Añadir nudos ocasionales
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 2; i += 1) {
     ctx.beginPath();
-    ctx.globalAlpha = Math.random() * 0.2;
-    const nx = Math.random() * 512;
-    const ny = Math.random() * 512;
-    ctx.ellipse(nx, ny, Math.random() * 40, Math.random() * 20, Math.random() * Math.PI, 0, Math.PI * 2);
+    ctx.globalAlpha = Math.random() * 0.16;
+    const nx = Math.random() * 256;
+    const ny = Math.random() * 256;
+    ctx.ellipse(nx, ny, Math.random() * 18, Math.random() * 10, Math.random() * Math.PI, 0, Math.PI * 2);
     ctx.fillStyle = darkerColor;
     ctx.fill();
   }
@@ -141,219 +122,301 @@ const createWoodTexture = (baseColor: string) => {
   const texture = new THREE.CanvasTexture(canvas);
   texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
   texture.repeat.set(2, 2);
+  texture.needsUpdate = true;
   return texture;
-};
+}
 
-// --- Componente de Modelo ---
-const Model = ({ url, setMeshList, onMeshClick, onMeshesLoaded, width, height, depth, woodConfig, onLoaded }: { 
-  url: string, 
-  setMeshList: (list: MeshNode[]) => void,
-  onMeshClick?: (name: string) => void,
-  onMeshesLoaded?: (names: string[]) => void,
-  width?: number,
-  height?: number,
-  depth?: number,
-  woodConfig?: { color: string; roughness: number },
-  onLoaded?: () => void
-}) => {
-  const { scene } = useGLTF(url);
+const Model = memo(function Model({
+  url,
+  onMeshClick,
+  onMeshesLoaded,
+  width,
+  height,
+  depth,
+  woodConfig,
+  onLoaded,
+}: {
+  url: string;
+  onMeshClick?: (name: string) => void;
+  onMeshesLoaded?: (names: string[]) => void;
+  width?: number;
+  height?: number;
+  depth?: number;
+  woodConfig?: { color: string; roughness: number };
+  onLoaded?: () => void;
+}) {
+  const { scene: sourceScene } = useGLTF(url);
   const [hovered, setHovered] = useState<string | null>(null);
-  useCursor(!!hovered);
+  useCursor(Boolean(hovered));
 
-  // Aplicar material de madera
-  useEffect(() => {
-    if (!woodConfig) return;
-    const woodTexture = createWoodTexture(woodConfig.color);
-
-    scene.traverse((node) => {
-      if (!(node as THREE.Mesh).isMesh) return;
+  const clonedScene = useMemo(() => {
+    const nextScene = sourceScene.clone(true);
+    nextScene.traverse((node) => {
       const mesh = node as THREE.Mesh;
-      if (!mesh.material) return;
+      if (!mesh.isMesh) return;
 
-      const mat = Array.isArray(mesh.material)
-        ? mesh.material[0]
-        : mesh.material;
-      if (!(mat instanceof THREE.MeshStandardMaterial)) return;
+      if (Array.isArray(mesh.material)) {
+        mesh.material = mesh.material.map((material) => material.clone());
+        return;
+      }
 
-      mat.map = woodTexture;
-      mat.color = new THREE.Color(woodConfig.color);
-      mat.roughness = woodConfig.roughness;
-      mat.needsUpdate = true;
-    });
-  }, [scene, woodConfig, woodConfig?.color, woodConfig?.roughness]);
-
-  useEffect(() => {
-    const meshes: MeshNode[] = [];
-    scene.traverse((node) => {
-      if ((node as THREE.Mesh).isMesh) {
-        meshes.push({
-          name: node.name,
-          uuid: node.uuid,
-          visible: node.visible
-        });
+      if (mesh.material) {
+        mesh.material = mesh.material.clone();
       }
     });
-    setMeshList(meshes);
+    return nextScene;
+  }, [sourceScene]);
 
-    if (onMeshesLoaded) {
-      const names: string[] = [];
-      scene.traverse((node) => {
-        if ((node as THREE.Mesh).isMesh) {
-          names.push(node.name || "(sin nombre)");
-        }
-      });
-      onMeshesLoaded(names);
-    }
+  const meshNames = useMemo(() => {
+    const names: string[] = [];
+    clonedScene.traverse((node) => {
+      if ((node as THREE.Mesh).isMesh) {
+        names.push(node.name || "(sin nombre)");
+      }
+    });
+    return names;
+  }, [clonedScene]);
 
-    const box = new THREE.Box3().setFromObject(scene);
-    const center = new THREE.Vector3();
-    box.getCenter(center);
-    scene.position.sub(center);
-
-    if (onLoaded) onLoaded();
-  }, [scene, setMeshList]); // Quitamos onLoaded de dependencias para evitar loops
+  const woodTexture = useMemo(() => {
+    if (!woodConfig) return null;
+    return createWoodTexture(woodConfig.color);
+  }, [woodConfig]);
 
   useEffect(() => {
-    if (width && height && depth) {
-      scene.scale.set(1, 1, 1);
-      const currentBox = new THREE.Box3().setFromObject(scene);
-      const currentSize = new THREE.Vector3();
-      currentBox.getSize(currentSize);
-      
-      scene.scale.set(
-        width / (currentSize.x || 1),
-        height / (currentSize.y || 1),
-        depth / (currentSize.z || 1)
-      );
+    if (onMeshesLoaded) onMeshesLoaded(meshNames);
+  }, [meshNames, onMeshesLoaded]);
 
-      const newBox = new THREE.Box3().setFromObject(scene);
-      const newCenter = new THREE.Vector3();
-      newBox.getCenter(newCenter);
-      scene.position.sub(newCenter);
-    }
-  }, [width, height, depth, scene]);
+  useEffect(() => {
+    const box = new THREE.Box3().setFromObject(clonedScene);
+    const center = new THREE.Vector3();
+    box.getCenter(center);
+    clonedScene.position.sub(center);
+    onLoaded?.();
+  }, [clonedScene, onLoaded]);
 
-  const handleClick = (e: ThreeEvent<MouseEvent>) => {
-    e.stopPropagation();
-    if (onMeshClick) onMeshClick((e.object as THREE.Mesh).name);
-  };
+  useEffect(() => {
+    if (!(width && height && depth)) return;
+
+    clonedScene.scale.set(1, 1, 1);
+    const currentBox = new THREE.Box3().setFromObject(clonedScene);
+    const currentSize = new THREE.Vector3();
+    currentBox.getSize(currentSize);
+
+    clonedScene.scale.set(
+      width / (currentSize.x || 1),
+      height / (currentSize.y || 1),
+      depth / (currentSize.z || 1),
+    );
+
+    const centeredBox = new THREE.Box3().setFromObject(clonedScene);
+    const centered = new THREE.Vector3();
+    centeredBox.getCenter(centered);
+    clonedScene.position.sub(centered);
+  }, [clonedScene, depth, height, width]);
+
+  useEffect(() => {
+    clonedScene.traverse((node) => {
+      const mesh = node as THREE.Mesh;
+      if (!mesh.isMesh) return;
+
+      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      materials.forEach((material) => {
+        if (!(material instanceof THREE.MeshStandardMaterial)) return;
+        material.map = woodTexture;
+        if (woodConfig) {
+          material.color = new THREE.Color(woodConfig.color);
+          material.roughness = woodConfig.roughness;
+        }
+        material.needsUpdate = true;
+      });
+    });
+  }, [clonedScene, woodConfig, woodTexture]);
+
+  useEffect(() => {
+    return () => {
+      disposeObjectResources(clonedScene);
+      woodTexture?.dispose();
+    };
+  }, [clonedScene, woodTexture]);
+
+  const handleClick = useCallback(
+    (e: ThreeEvent<MouseEvent>) => {
+      e.stopPropagation();
+      onMeshClick?.((e.object as THREE.Mesh).name);
+    },
+    [onMeshClick],
+  );
 
   return (
-    <primitive 
-      object={scene} 
+    <primitive
+      object={clonedScene}
       onClick={handleClick}
-      onPointerOver={(e: ThreeEvent<MouseEvent>) => {
+      onPointerOver={(e: ThreeEvent<PointerEvent>) => {
         e.stopPropagation();
         setHovered((e.object as THREE.Mesh).name);
       }}
       onPointerOut={() => setHovered(null)}
     />
   );
-};
+});
 
-// --- Visor Principal ---
-export default function ProfessionalViewer({ modelUrl, onMeshClick, onMeshesLoaded, width, height, depth, woodConfig, onReset, cameraState, onCameraChange }: ProfessionalViewerProps) {
-  const [shouldAdjust, setShouldAdjust] = useState(true);
+function ViewerLights() {
+  return (
+    <>
+      <ambientLight intensity={0.85} />
+      <hemisphereLight args={["#ffffff", "#1a1a1a", 0.55]} />
+      <directionalLight position={[5, 7, 4]} intensity={1.1} />
+      <directionalLight position={[-4, 2, -3]} intensity={0.35} />
+    </>
+  );
+}
+
+export default function ProfessionalViewer({
+  modelUrl,
+  onMeshClick,
+  onMeshesLoaded,
+  width,
+  height,
+  depth,
+  woodConfig,
+  onReset,
+  cameraState,
+  onCameraChange,
+}: ProfessionalViewerProps) {
+  const [contextLost, setContextLost] = useState(false);
+  const [contextResetKey, setContextResetKey] = useState(0);
   const controlsRef = useRef<OrbitControlsImpl>(null);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [_meshList, setMeshList] = useState<MeshNode[]>([]);
+  const canvasCleanupRef = useRef<(() => void) | null>(null);
+  const isSafari = isSafariBrowser();
+  const dpr = getCanvasDpr();
 
-  const hasCameraState = !!cameraState;
-  
   useEffect(() => {
-    setShouldAdjust(!hasCameraState);
-  }, [modelUrl, hasCameraState]);
+    return () => {
+      canvasCleanupRef.current?.();
+    };
+  }, []);
 
-  // const toggleMeshVisibility = (name: string) => {
-  //   setVisibleMeshes(prev => ({
-  //     ...prev,
-  //     [name]: prev[name] === false
-  //   }));
-  // };
-
-  const handleModelLoaded = React.useCallback(() => {
+  const handleModelLoaded = useCallback(() => {
     if (cameraState && controlsRef.current) {
       const { position, target } = cameraState;
       controlsRef.current.object.position.set(...position);
       controlsRef.current.target.set(...target);
       controlsRef.current.update();
-      setShouldAdjust(false);
-    } else {
-      setTimeout(() => {
-        setShouldAdjust(false);
-      }, 100);
     }
   }, [cameraState]);
 
-  const internalReset = () => {
-    setShouldAdjust(true);
-    if (onReset) onReset();
-  };
+  const internalReset = useCallback(() => {
+    onReset?.();
+  }, [onReset]);
 
-  const handleCameraChange = React.useCallback(() => {
-    if (onCameraChange && controlsRef.current) {
-      const position = controlsRef.current.object.position.toArray() as [number, number, number];
-      const target = controlsRef.current.target.toArray() as [number, number, number];
-      onCameraChange({ position, target });
-    }
+  const handleCameraChange = useCallback(() => {
+    if (!onCameraChange || !controlsRef.current) return;
+    const position = controlsRef.current.object.position.toArray() as [number, number, number];
+    const target = controlsRef.current.target.toArray() as [number, number, number];
+    onCameraChange({ position, target });
   }, [onCameraChange]);
 
+  const handleContextReset = useCallback(() => {
+    setContextLost(false);
+    setContextResetKey((prev) => prev + 1);
+  }, []);
+
   return (
-    <div className="relative w-full h-full bg-neutral-900 rounded-xl overflow-hidden shadow-2xl touch-none">
+    <div className="relative h-full w-full overflow-hidden rounded-xl bg-neutral-900 shadow-2xl touch-none">
       <Canvas
-        shadows
-        camera={{ fov: 45, position: [200, 200, 200] }}
-        gl={{ 
-          antialias: true, 
+        key={`${modelUrl}-${contextResetKey}`}
+        camera={{ fov: 42, position: [180, 180, 180], near: 0.1, far: 2000 }}
+        dpr={dpr}
+        gl={{
+          antialias: false,
+          alpha: true,
+          powerPreference: isSafari ? "low-power" : "high-performance",
+          preserveDrawingBuffer: false,
           toneMapping: THREE.ACESFilmicToneMapping,
           outputColorSpace: THREE.SRGBColorSpace,
-          preserveDrawingBuffer: true 
         }}
-        dpr={[1, 2]}
+        onCreated={({ gl, invalidate }) => {
+          canvasCleanupRef.current?.();
+          const canvas = gl.domElement;
+          const handleLost = (event: Event) => {
+            event.preventDefault();
+            setContextLost(true);
+          };
+          const handleRestored = () => {
+            setContextLost(false);
+            invalidate();
+          };
+
+          canvas.addEventListener("webglcontextlost", handleLost, false);
+          canvas.addEventListener("webglcontextrestored", handleRestored, false);
+          canvasCleanupRef.current = () => {
+            canvas.removeEventListener("webglcontextlost", handleLost, false);
+            canvas.removeEventListener("webglcontextrestored", handleRestored, false);
+          };
+        }}
       >
         <Suspense fallback={<Loader />}>
-          <Stage 
-            intensity={0.5} 
-            environment="city" 
-            shadows={false} 
-            adjustCamera={shouldAdjust}
-          >
-            <group scale={0.85}>
-              <Model 
-                url={modelUrl} 
-                setMeshList={setMeshList}
-                onMeshClick={onMeshClick}
-                onMeshesLoaded={onMeshesLoaded}
-                width={width}
-                height={height}
-                depth={depth}
-                woodConfig={woodConfig}
-                onLoaded={handleModelLoaded}
-              />
-            </group>
-          </Stage>
-
-          <DynamicOrbitControls 
+          <ViewerLights />
+          <group scale={0.82}>
+            <Model
+              url={modelUrl}
+              onMeshClick={onMeshClick}
+              onMeshesLoaded={onMeshesLoaded}
+              width={width}
+              height={height}
+              depth={depth}
+              woodConfig={woodConfig}
+              onLoaded={handleModelLoaded}
+            />
+          </group>
+          <DynamicOrbitControls
             controlsRef={controlsRef}
             onCameraChange={handleCameraChange}
-            setShouldAdjust={setShouldAdjust}
             objWidth={Math.max(width || 100, depth || 100)}
             objHeight={height || 180}
           />
         </Suspense>
       </Canvas>
 
-      {/* Botón de Reset */}
-      <div className="absolute top-4 left-4">
-        <button 
+      <div className="absolute left-4 top-4">
+        <button
           onClick={internalReset}
-          className="px-3 py-2 bg-black/60 backdrop-blur-md hover:bg-black/80 text-white rounded-lg text-[10px] font-bold transition-all flex items-center gap-2 border border-white/10 shadow-lg"
+          className="flex items-center gap-2 rounded-lg border border-white/10 bg-black/60 px-3 py-2 text-[10px] font-bold text-white shadow-lg transition-all hover:bg-black/80"
           title="Reiniciar Vista"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4 text-emerald-400"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+          </svg>
           RESET
         </button>
       </div>
+
+      {contextLost && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/75 px-6 text-center">
+          <div className="max-w-xs space-y-4">
+            <p className="text-sm font-medium text-white">
+              El visor 3D perdio el contexto WebGL. Reinicialo para evitar la pantalla en blanco.
+            </p>
+            <button
+              type="button"
+              onClick={handleContextReset}
+              className="rounded-lg bg-emerald-500 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-black"
+            >
+              Reiniciar visor
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -362,9 +425,11 @@ function Loader() {
   return (
     <Html center>
       <div className="flex flex-col items-center text-white">
-        <div className="w-10 h-10 border-4 border-t-emerald-500 border-neutral-700 rounded-full animate-spin mb-2" />
+        <div className="mb-2 h-10 w-10 animate-spin rounded-full border-4 border-neutral-700 border-t-emerald-500" />
         <p className="text-sm font-medium">Cargando experiencia 3D...</p>
       </div>
     </Html>
   );
 }
+
+useGLTF.preload("/models/base.glb");
